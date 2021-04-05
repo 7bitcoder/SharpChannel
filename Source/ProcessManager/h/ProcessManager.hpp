@@ -2,15 +2,16 @@
 #include <iostream>
 #include <functional>
 #include <memory>
-#include "ProcessComunicator.hpp"
+#include "IProcessComunicator.hpp"
 #include "StdComunicator.hpp"
+#include "SocketServer.hpp"
+#include "Settings.hpp"
 
 #ifdef WIN
     
 #endif
 
 namespace pm {
-
     class ProcessManagerException: public std::exception {
         public:
             explicit ProcessManagerException(const char* message)
@@ -29,6 +30,10 @@ namespace pm {
     
     class ProcessManager {
         public:
-            static std::unique_ptr<ReadOnlySubject> makeSTDComunicator(const std::string& childProcessCommand);
+            static std::unique_ptr<IReadOnlySubject> makeStdIO(const StdSubjectSettings& settings);
+
+            static std::unique_ptr<IReadOnlySubject> makeSystemCommand(const RunCommandSettings& settings);
+
+            static std::unique_ptr<ISubject> makeSocketServer(const SocketServerSettings& settings);
     };
 }

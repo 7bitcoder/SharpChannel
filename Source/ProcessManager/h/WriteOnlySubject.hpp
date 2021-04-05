@@ -1,9 +1,13 @@
+#pragma once
 #include <iostream>
-#include "ProcessComunicator.hpp"
+#include <functional>
+#include <map>
+#include "IWriteOnlySubject.hpp"
 
 namespace pm {
-    struct WriteOnlySubject: public virtual ProcessComunicator {
-        virtual ~WriteOnlySubject() {}
-        virtual bool next(const std::string& msg) = 0;
+    class WriteOnlySubject: public virtual IWriteOnlySubject {
+        public:
+
+            virtual ~WriteOnlySubject() {}
     };
 }

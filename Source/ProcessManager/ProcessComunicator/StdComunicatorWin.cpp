@@ -2,15 +2,15 @@
 #include "OsFlags.hpp"
 
 
-namespace pc {
+namespace pm {
     #ifdef WIN
     namespace {
-        long runCommand(const std::string& command, pm::callbacksMap& map);
+        long runCommand(const std::string& command, pm::CallbacksMap& map);
         void sendDataToCommand(const std::string& data);
     }
 
     void StdComunicator::run() {
-        runCommand(_childProcessCmd, *_callbacks);
+        runCommand(_settings.childProcessCommand, *_callbacks);
     }
 
     #include <windows.h> 
@@ -32,7 +32,7 @@ namespace pc {
         bool ReadFromPipe(std::string& data); 
         void ErrorExit(const char*); 
         
-        long runCommand(const std::string& command, pm::callbacksMap& map) { 
+        long runCommand(const std::string& command, pm::CallbacksMap& map) { 
             SECURITY_ATTRIBUTES saAttr; 
             
             printf("\n->Start of parent execution.\n");
@@ -83,8 +83,8 @@ namespace pc {
                     break;
                 } 
 
-                for(auto& callback: map) {
-                    auto result = callback.second->call(msg);
+                for(auto& next: map) {
+                    auto result = next.second->next(msg);
                 }
             }
             

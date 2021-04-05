@@ -2,39 +2,23 @@
 #include <iostream>
 #include <functional>
 #include <map>
-#include "Control.hpp"
-#include "ProcessComunicator.hpp"
+#include "Callback.hpp"
+#include "IReadOnlySubject.hpp"
 
 namespace pm {
-    class ReadOnlySubject;
-    class Callback;
-
-    using callback = std::function<Control(const std::string& msg)>;
-    using callbacksMap = std::map<size_t, std::shared_ptr<Callback>>;
-    
-    struct Unsubscribable {
-        virtual bool unsunscribe() = 0;
-    };
-
-    class Callback final: public Unsubscribable {
-        friend class ReadOnlySubject;
+    class ReadOnlySubject: public virtual IReadOnlySubject {
         public:
-            bool unsunscribe();
-            Control call(const std::string& msg) { return _callback(msg); }
-        private:
-            Callback(std::shared_ptr<callbacksMap> map, size_t identifier, const callback& callback);
-            size_t _identifier;
-            callback _callback;
-            std::shared_ptr<callbacksMap> _map;
-    };
-    
-    struct ReadOnlySubject: public virtual ProcessComunicator {
-        friend class Callback;
-            ReadOnlySubject() { _callbacks = std::make_shared<callbacksMap>(); }
+            ReadOnlySubject() { _callbacks = std::make_shared<CallbacksMap>(); }
+
+            std::shared_ptr<IUnsubscribable> subscribe(const Next& callback) override;
+            std::shared_ptr<IUnsubscribable> subscribe(const Next& callback, const Complete& complete) override;
+            std::shared_ptr<IUnsubscribable> subscribe(IObserver& observer) override;
+            
             virtual ~ReadOnlySubject() {}
-            std::shared_ptr<Unsubscribable> subscribe(const callback& callback);
         protected:
-            std::shared_ptr<callbacksMap> _callbacks;
+            void completeAll();
+            void nextAll(const std::string& msg);
+            std::shared_ptr<CallbacksMap> _callbacks;
         private:
             size_t _indexCnt = 0;
     };

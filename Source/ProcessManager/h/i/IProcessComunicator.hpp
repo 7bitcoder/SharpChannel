@@ -5,8 +5,10 @@
 
 namespace pm {
 
-    struct ProcessComunicator {
-        virtual ~ProcessComunicator() {}
+    struct IProcessComunicator {
         virtual void run() = 0;
+        virtual void finish() {};
+        
+        virtual ~IProcessComunicator() {}
     };
 }
