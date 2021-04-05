@@ -17,7 +17,7 @@ namespace pm {
        
     }
 
-    bool NamedPipe::send(const std::string& msg) {
+    bool NamedPipe::sendImpl(const std::string& msg) {
         return false;
     }
 }

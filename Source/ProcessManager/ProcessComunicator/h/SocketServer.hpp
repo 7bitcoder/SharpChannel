@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include "IProcessComunicator.hpp"
 #include "Settings.hpp"
 #include "Control.hpp"
@@ -8,11 +9,12 @@ namespace pm {
     class SocketServer final: public pm::Subject {
         public:
             SocketServer(const SocketServerSettings& settings) { _settings = settings; init(); }
-            ~SocketServer() {}
+            ~SocketServer();
             void init();
             void run() override;
-            bool send(const std::string& msg) override;
+            bool sendImpl(const std::string& msg) override;
         private:
+            std::mutex guard;
             SocketServerSettings _settings;
     };
 }

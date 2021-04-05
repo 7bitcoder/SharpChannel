@@ -10,7 +10,7 @@ namespace pm {
     }
 
     void StdComunicator::run() {
-        runCommand(_settings.childProcessCommand, *_callbacks);
+        runCommand(_settings.childProcessCommand, getCallbacks());
     }
 
     #include <windows.h> 
@@ -45,7 +45,7 @@ namespace pm {
 
             // Create a pipe for the child process's STDOUT. 
             
-            if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) ) 
+            if ( !CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) ) 
                 ErrorExit("StdoutRd CreatePipe"); 
 
             // Ensure the read handle to the pipe for STDOUT is not inherited.

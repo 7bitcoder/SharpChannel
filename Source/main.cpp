@@ -46,7 +46,19 @@ int main(int, char**) {
         return pm::Control::Ok;
     };
 
-    comunicator->subscribe(onReceive);
 
+    comunicator->subscribe(onReceive);
+    
+    std::thread thread_object([&comunicator]() {
+        std::cout << "in thread";
+        int cnt = 0;
+        while (cnt < 20) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::string msg("cnt :");
+            msg += std::to_string(cnt++);
+            comunicator->send(msg);
+        }
+    });
     comunicator->run();
+    thread_object.join();
 }

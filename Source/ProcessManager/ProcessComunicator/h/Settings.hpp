@@ -23,5 +23,7 @@ namespace pm {
         };
         SocketType socketType = SocketType::Tcp;
         size_t port = 0; // chose default port
+        size_t receiveBufferSize = 4096;
+        size_t sendBufferSize = 4096;
     };
 }

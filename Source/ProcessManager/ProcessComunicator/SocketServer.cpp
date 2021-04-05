@@ -32,8 +32,11 @@ namespace pm {
         struct addrinfo hints;
 
         int iSendResult;
-        char recvbuf[DEFAULT_BUFLEN];
-        int recvbuflen = DEFAULT_BUFLEN;
+        char* recvbuf;
+    }
+
+    SocketServer::~SocketServer() {
+        delete[] recvbuf;
     }
 
     void SocketServer::init() {
@@ -41,6 +44,12 @@ namespace pm {
         iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
         if (iResult != 0) {
             printf("WSAStartup failed with error: %d\n", iResult);
+            return;
+        }
+
+        recvbuf = new char[_settings.receiveBufferSize];
+        
+        if (recvbuf == nullptr) {
             return;
         }
 
@@ -85,7 +94,8 @@ namespace pm {
     }
 
     void SocketServer::run() {
-               
+        
+        guard.lock();
         iResult = listen(ListenSocket, SOMAXCONN);
         if (iResult == SOCKET_ERROR) {
             printf("listen failed with error: %d\n", WSAGetLastError());
@@ -105,11 +115,11 @@ namespace pm {
 
         // No longer need server socket
         closesocket(ListenSocket);
-
+        guard.unlock();
         // Receive until the peer shuts down the connection
         do {
 
-            iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+            iResult = recv(ClientSocket, recvbuf, _settings.receiveBufferSize, 0);
             if (iResult > 0) {
                 printf("Bytes received: %d\n", iResult);
                 recvbuf[iResult] = '\0';
@@ -144,8 +154,10 @@ namespace pm {
         return;
     }
 
-    bool SocketServer::send(const std::string& msg) {
-        iSendResult = ::send( ClientSocket, recvbuf, iResult, 0 );
+    bool SocketServer::sendImpl(const std::string& msg) {
+        const std::lock_guard<std::mutex> lock(guard);
+ 
+        iSendResult = ::send( ClientSocket, msg.c_str(), msg.length(), 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
