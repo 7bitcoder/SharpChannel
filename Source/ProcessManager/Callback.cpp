@@ -5,8 +5,8 @@
 
 namespace pm {
 
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, size_t identifier, const Next& next, const Complete complete)
-        : _map(map), _next(std::move(next)), _complete(std::move(complete)) { _identifier = identifier; }
+    Callback::Callback(std::shared_ptr<CallbacksMap> map, size_t identifier, const OnReceive& onReceive, const OnComplete& onComplete)
+        : _map(map), _onReceive(std::move(onReceive)), _onComplete(std::move(onComplete)) { _identifier = identifier; }
 
     bool Callback::unsunscribe() {
         if(_map) {

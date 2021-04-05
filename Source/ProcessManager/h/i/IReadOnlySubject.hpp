@@ -9,13 +9,13 @@
 
 namespace pm {
 
-    using Next = std::function<Control(const std::string&)>;
-    using Complete = std::function<void(void)>;
+    using OnReceive = std::function<Control(const std::string&)>;
+    using OnComplete = std::function<void(void)>;
    
     struct IReadOnlySubject: public virtual IProcessComunicator {
 
-        virtual std::shared_ptr<IUnsubscribable> subscribe(const Next& callback) = 0;
-        virtual std::shared_ptr<IUnsubscribable> subscribe(const Next& callback, const Complete& complete) = 0;
+        virtual std::shared_ptr<IUnsubscribable> subscribe(const OnReceive& onReceive) = 0;
+        virtual std::shared_ptr<IUnsubscribable> subscribe(const OnReceive& onReceive, const OnComplete& onComplete) = 0;
         virtual std::shared_ptr<IUnsubscribable> subscribe(IObserver& observer) = 0;
             
         virtual ~IReadOnlySubject() {}

@@ -6,11 +6,11 @@
 
 namespace pm {
 
-    std::shared_ptr<IUnsubscribable> ReadOnlySubject::subscribe(const Next& next) {
+    std::shared_ptr<IUnsubscribable> ReadOnlySubject::subscribe(const OnReceive& next) {
         return subscribe(next, [](){});
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlySubject::subscribe(const Next& next, const Complete& complete) {
+    std::shared_ptr<IUnsubscribable> ReadOnlySubject::subscribe(const OnReceive& next, const OnComplete& complete) {
         auto index = _indexCnt++;
         std::shared_ptr<Callback> c( new Callback(_callbacks, index, next, complete));
         auto inserted = _callbacks->insert(std::make_pair(index, c));
@@ -33,6 +33,6 @@ namespace pm {
     } 
 
     std::shared_ptr<IUnsubscribable> ReadOnlySubject::subscribe(IObserver& observer) {
-        return subscribe(std::bind(&IObserver::next, &observer, std::placeholders::_1), std::bind(&IObserver::complete, &observer));
+        return subscribe(std::bind(&IObserver::onReceive, &observer, std::placeholders::_1), std::bind(&IObserver::onComplete, &observer));
     }
 }

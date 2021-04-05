@@ -53,7 +53,8 @@ namespace pm {
 
         // Resolve the server address and port
         auto portNumber = _settings.port;
-        PCSTR port = (portNumber == 0) ? DEFAULT_PORT : TEXT(std::to_string(portNumber).c_str());
+        auto portNumberStr = std::to_string(portNumber);
+        PCSTR port = (portNumber == 0) ? DEFAULT_PORT : TEXT(portNumberStr.c_str());
         iResult = getaddrinfo(NULL, port, &hints, &result);
         if ( iResult != 0 ) {
             printf("getaddrinfo failed with error: %d\n", iResult);
@@ -143,8 +144,8 @@ namespace pm {
         return;
     }
 
-    bool SocketServer::next(const std::string& msg) {
-        iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
+    bool SocketServer::send(const std::string& msg) {
+        iSendResult = ::send( ClientSocket, recvbuf, iResult, 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);

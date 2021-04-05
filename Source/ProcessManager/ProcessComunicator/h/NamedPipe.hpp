@@ -11,7 +11,7 @@ namespace pm {
             ~NamedPipe() {}
 
             void run() override;
-            bool next(const std::string& msg) override;
+            bool send(const std::string& msg) override;
         private:
             NamedPipeSettings _settings;
     };

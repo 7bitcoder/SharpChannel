@@ -4,8 +4,8 @@
 namespace pm {
     
     struct IObserver {
-        virtual Control next(const std::string& message) = 0;
-        virtual void complete() = 0;
+        virtual Control onReceive(const std::string& message) = 0;
+        virtual void onComplete() = 0;
 
         virtual ~IObserver() {}
     };

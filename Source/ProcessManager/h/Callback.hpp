@@ -12,13 +12,13 @@ namespace pm {
     class Callback final: public IUnsubscribable {
         public:
             bool unsunscribe();
-            Control next(const std::string& msg) { return _next(msg); }
-            void complete() { return _complete(); }
-            Callback(std::shared_ptr<CallbacksMap> map, size_t identifier, const Next& next, const Complete complete);
+            Control next(const std::string& msg) { return _onReceive(msg); }
+            void complete() { return _onComplete(); }
+            Callback(std::shared_ptr<CallbacksMap> map, size_t identifier, const OnReceive& onReceive, const OnComplete& onComplete);
         private:
             size_t _identifier;
-            Next _next;
-            Complete _complete;
+            OnReceive _onReceive;
+            OnComplete _onComplete;
             std::shared_ptr<CallbacksMap> _map;
     };
 }

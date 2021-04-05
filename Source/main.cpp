@@ -26,16 +26,27 @@ class Handler: public pm::IObserver {
             }
             std::cout << "message received: " << messageReceived << std::endl;
             
-            _comunicator->next(messageReceived);
+            _comunicator->send(messageReceived);
             return pm::Control::Ok;
         }
 
-        pm::Control next(const std::string& messageReceived) override { return this->operator()(messageReceived);}
-        void complete() override { std::cout << "complete: " << std::endl; }
+        pm::Control onReceive(const std::string& messageReceived) override { return this->operator()(messageReceived);}
+        void onComplete() override { std::cout << "complete: " << std::endl; }
         ~Handler() {}
 };
 
 int main(int, char**) {
-    Handler g;
-    g.run();
+
+    pm::SocketServerSettings settings;
+    auto comunicator = pm::ProcessManager::makeSocketServer(settings);
+
+    auto onReceive = [&comunicator] (const std::string& msg) {
+        std::cout << "message received: " << msg << std::endl;
+        comunicator->send(msg);
+        return pm::Control::Ok;
+    };
+
+    comunicator->subscribe(onReceive);
+
+    comunicator->run();
 }

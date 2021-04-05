@@ -10,8 +10,8 @@ namespace pm {
         public:
             ReadOnlySubject() { _callbacks = std::make_shared<CallbacksMap>(); }
 
-            std::shared_ptr<IUnsubscribable> subscribe(const Next& callback) override;
-            std::shared_ptr<IUnsubscribable> subscribe(const Next& callback, const Complete& complete) override;
+            std::shared_ptr<IUnsubscribable> subscribe(const OnReceive& callback) override;
+            std::shared_ptr<IUnsubscribable> subscribe(const OnReceive& callback, const OnComplete& complete) override;
             std::shared_ptr<IUnsubscribable> subscribe(IObserver& observer) override;
             
             virtual ~ReadOnlySubject() {}

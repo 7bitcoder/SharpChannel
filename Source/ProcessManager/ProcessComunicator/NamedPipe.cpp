@@ -17,7 +17,7 @@ namespace pm {
        
     }
 
-    bool NamedPipe::next(const std::string& msg) {
+    bool NamedPipe::send(const std::string& msg) {
         return false;
     }
 }
