@@ -1,5 +1,6 @@
 #include <iostream>
-#include "ChannelManager.hpp"
+#include <thread>
+#include "SharpChannel.hpp"
 
 class Handler: public cm::IMessageObserver {
     private:
@@ -8,7 +9,7 @@ class Handler: public cm::IMessageObserver {
         Handler() {
             cm::SocketServerSettings settings;
 
-            _comunicator = cm::ChannelManager::makeSocketServer(settings);
+            _comunicator = cm::SharpChannel::makeSocketServer(settings);
         }
 
         void run() {
@@ -38,7 +39,7 @@ class Handler: public cm::IMessageObserver {
 int main(int, char**) {
 
     cm::SocketServerSettings settings;
-    auto comunicator = cm::ChannelManager::makeSocketServer(settings);
+    auto comunicator = cm::SharpChannel::makeSocketServer(settings);
 
     auto onMessageReceived = [&comunicator] (const std::string& msg) {
         std::cout << "message received: " << msg << std::endl;

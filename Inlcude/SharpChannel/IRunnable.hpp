@@ -1,7 +1,4 @@
 #pragma once
-#include <iostream>
-#include <functional>
-#include "Control.hpp"
 
 namespace cm {
 

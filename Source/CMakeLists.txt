@@ -1,12 +1,10 @@
 
-add_subdirectory(ChannelManager)
+add_subdirectory(Channels)
 
-add_executable(pipe main.cpp)
-
-target_link_libraries(pipe
-    ChannelManager
+add_library(SharpChannel
+    SharpChannel.cpp
 )
 
-target_include_directories(pipe PUBLIC 
-    "ChannelManager/h"
+target_link_libraries(SharpChannel
+    Channels
 )

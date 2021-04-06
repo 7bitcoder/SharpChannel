@@ -1,4 +1,5 @@
 
+add_subdirectory(Implementation)
 
 add_library(Channels
     ReadOnlyChannel.cpp
@@ -7,10 +8,9 @@ add_library(Channels
 )
 
 target_link_libraries(Channels
-    ChannelsImplementation
+    Implementation
 )
 
-target_include_directories(Channels PUBLIC 
+target_include_directories(Channels PUBLIC
     ".h"
-    ".h/.i"
 )

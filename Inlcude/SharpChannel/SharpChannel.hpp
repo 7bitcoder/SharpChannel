@@ -1,15 +1,16 @@
 #pragma once
 #include <iostream>
-#include <functional>
 #include <memory>
-#include "IRunnable.hpp"
-#include "StdComunicator.hpp"
-#include "SocketServer.hpp"
+#include "Control.hpp"
 #include "Settings.hpp"
-
-#ifdef WIN
-    
-#endif
+#include "IRunnable.hpp"
+#include "IObserver.hpp"
+#include "IMessageObserver.hpp"
+#include "IDataObserver.hpp"
+#include "IChannel.hpp"
+#include "IReadOnlyChannel.hpp"
+#include "IWriteOnlyChannel.hpp"
+#include "IUnsubscribable.hpp"
 
 namespace cm {
     class ChannelException: public std::exception {
@@ -28,7 +29,7 @@ namespace cm {
             std::string msg_;
     };
     
-    class ChannelManager {
+    class SharpChannel {
         public:
             static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdChannelSettings& settings);
 
