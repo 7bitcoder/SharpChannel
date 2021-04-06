@@ -154,7 +154,7 @@ namespace cm {
         return;
     }
     
-    bool SocketServer::sendImpl(const char* data, size_t lenght) {
+    bool SocketServer::sendDataImpl(const char* data, size_t lenght) {
         const std::lock_guard<std::mutex> lock(guard);
  
         iSendResult = ::send( ClientSocket, data, lenght, 0 );
@@ -168,8 +168,8 @@ namespace cm {
         return true;
     }
 
-    bool SocketServer::sendImpl(const std::string& msg) {
-        return sendImpl(msg.c_str(), msg.length());
+    bool SocketServer::sendMessageImpl(const std::string& msg) {
+        return sendDataImpl(msg.c_str(), msg.length());
     }
 }
 #endif

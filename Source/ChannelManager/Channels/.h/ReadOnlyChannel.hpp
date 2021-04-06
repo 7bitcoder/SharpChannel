@@ -11,16 +11,17 @@ namespace cm {
         public:
             ReadOnlyChannel() { _callbacks = std::make_shared<CallbacksMap>(); }
 
-            std::shared_ptr<IUnsubscribable> subscribe(const OnComplete& onComplete) final;
+            std::shared_ptr<IUnsubscribable> subscribe(const onCompleted& onCompleted) final;
 
             std::shared_ptr<IUnsubscribable> subscribe(const OnMessageReceived& onMessageReceived) final;
             std::shared_ptr<IUnsubscribable> subscribe(const OnDataReceived& onDataReceived) final;
 
-            std::shared_ptr<IUnsubscribable> subscribe(const OnMessageReceived& onMessageReceived, const OnComplete& onComplete) final;
-            std::shared_ptr<IUnsubscribable> subscribe(const OnDataReceived& onDataReceived, const OnComplete& onComplete) final;
+            std::shared_ptr<IUnsubscribable> subscribe(const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted) final;
+            std::shared_ptr<IUnsubscribable> subscribe(const OnDataReceived& onDataReceived, const onCompleted& onCompleted) final;
 
             std::shared_ptr<IUnsubscribable> subscribe(IMessageObserver& observer) final;
             std::shared_ptr<IUnsubscribable> subscribe(IDataObserver& observer) final;
+            std::shared_ptr<IUnsubscribable> subscribe(IObserver& observer) final;
 
             virtual ~ReadOnlyChannel() {}
         protected:

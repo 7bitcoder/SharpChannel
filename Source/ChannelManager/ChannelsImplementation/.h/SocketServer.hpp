@@ -12,9 +12,9 @@ namespace cm {
             ~SocketServer();
             void init();
             void run() override;
-            
-            bool sendImpl(const char* data, size_t lenght) override;
-            bool sendImpl(const std::string& msg) override;
+
+            bool sendMessageImpl(const std::string& msg) override;
+            bool sendDataImpl(const char* data, size_t lenght) override;
         private:
             std::mutex guard;
             SocketServerSettings _settings;

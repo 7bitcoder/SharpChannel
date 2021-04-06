@@ -5,7 +5,7 @@
 namespace cm {
     
     struct IObserver {
-        virtual void onComplete() = 0;
+        virtual void onCompleted() = 0;
 
         virtual ~IObserver() {}
     };

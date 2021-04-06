@@ -17,11 +17,11 @@ namespace cm {
        
     }
 
-    bool NamedPipe::sendImpl(const std::string& msg) {
+    bool NamedPipe::sendMessageImpl(const std::string& msg) {
         return false;
     }
     
-    bool NamedPipe::sendImpl(const char* data, size_t lenght) {
+    bool NamedPipe::sendDataImpl(const char* data, size_t lenght) {
         return false;
     }
 }

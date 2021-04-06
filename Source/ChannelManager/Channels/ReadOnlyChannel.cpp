@@ -6,36 +6,41 @@
 
 namespace cm {
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnComplete& onComplete) {
-        return subscribeImpl(std::make_shared<Callback>(_callbacks, onComplete));
+    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const onCompleted& onCompleted) {
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onCompleted));
     }
 
     std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived& onMessageReceived) {
         return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived));
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived& onMessageReceived, const OnComplete& onComplete) {
-        return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived, onComplete));
+    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted) {
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived, onCompleted));
     }
 
     std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IMessageObserver& observer) {
         OnMessageReceived onMessageReceived = std::bind(&IMessageObserver::onMessageReceived, &observer, std::placeholders::_1);
-        OnComplete onComplete = std::bind(&IMessageObserver::onComplete, &observer);
-        return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived, onComplete));
+        onCompleted onCompleted = std::bind(&IMessageObserver::onCompleted, &observer);
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived, onCompleted));
     }
 
     std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived& onMessageReceived) {
         return subscribeImpl(std::make_shared<Callback>(_callbacks, onMessageReceived));
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived& onRawReceive, const OnComplete& onComplete) {
-        return subscribeImpl(std::make_shared<Callback>(_callbacks, onRawReceive, onComplete));
+    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived& onDataReceived, const onCompleted& onCompleted) {
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onDataReceived, onCompleted));
     }
 
     std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IDataObserver& observer) {
-        OnDataReceived onRawReceive = std::bind(&IDataObserver::onDataReceived, &observer, std::placeholders::_1, std::placeholders::_2);
-        OnComplete onComplete = std::bind(&IDataObserver::onComplete, &observer);
-        return subscribeImpl(std::make_shared<Callback>(_callbacks, onRawReceive, onComplete));
+        OnDataReceived onDataReceived = std::bind(&IDataObserver::onDataReceived, &observer, std::placeholders::_1, std::placeholders::_2);
+        onCompleted onCompleted = std::bind(&IDataObserver::onCompleted, &observer);
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onDataReceived, onCompleted));
+    }
+
+    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IObserver& observer) {
+        onCompleted onCompleted = std::bind(&IObserver::onCompleted, &observer);
+        return subscribeImpl(std::make_shared<Callback>(_callbacks, onCompleted));
     }
 
     void ReadOnlyChannel::nextAll(const std::string& msg) {
@@ -80,5 +85,4 @@ namespace cm {
         }
         return nullptr;
     }
-
 }
