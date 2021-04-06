@@ -1,14 +1,14 @@
 #include <iostream>
-#include "ProcessManager.hpp"
+#include "ChannelManager.hpp"
 
-class Handler: public pm::IObserver {
+class Handler: public cm::IMessageObserver {
     private:
-        std::unique_ptr<pm::ISubject> _comunicator; 
+        std::unique_ptr<cm::IChannel> _comunicator; 
     public:
         Handler() {
-            pm::SocketServerSettings settings;
+            cm::SocketServerSettings settings;
 
-            _comunicator = pm::ProcessManager::makeSocketServer(settings);
+            _comunicator = cm::ChannelManager::makeSocketServer(settings);
         }
 
         void run() {
@@ -19,35 +19,42 @@ class Handler: public pm::IObserver {
             unsubscriber->unsunscribe();
         }
 
-        pm::Control operator()(const std::string& messageReceived)  {
+        cm::Control operator()(const std::string& messageReceived)  {
             if(messageReceived == "exit") {
                 std::cout << "exiting: " << std::endl;
-                return pm::Control::Stop;
+                return cm::Control::Stop;
             }
             std::cout << "message received: " << messageReceived << std::endl;
             
             _comunicator->send(messageReceived);
-            return pm::Control::Ok;
+            return cm::Control::Ok;
         }
 
-        pm::Control onReceive(const std::string& messageReceived) override { return this->operator()(messageReceived);}
+        cm::Control onMessageReceived(const std::string& messageReceived) override { return this->operator()(messageReceived);}
         void onComplete() override { std::cout << "complete: " << std::endl; }
         ~Handler() {}
 };
 
 int main(int, char**) {
 
-    pm::SocketServerSettings settings;
-    auto comunicator = pm::ProcessManager::makeSocketServer(settings);
+    cm::SocketServerSettings settings;
+    auto comunicator = cm::ChannelManager::makeSocketServer(settings);
 
-    auto onReceive = [&comunicator] (const std::string& msg) {
+    auto onMessageReceived = [&comunicator] (const std::string& msg) {
         std::cout << "message received: " << msg << std::endl;
         comunicator->send(msg);
-        return pm::Control::Ok;
+        return cm::Control::Ok;
+    };
+
+    auto onRawReceive = [&comunicator] (const char* data, size_t lenght) {
+        std::cout << "message Raw received: " << data << std::endl;
+        comunicator->send(data, lenght);
+        return cm::Control::Ok;
     };
 
 
-    comunicator->subscribe(onReceive);
+    comunicator->subscribe(onMessageReceived);
+    comunicator->subscribe(onRawReceive);
     
     std::thread thread_object([&comunicator]() {
         std::cout << "in thread";
