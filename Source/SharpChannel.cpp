@@ -5,15 +5,15 @@
 namespace cm {
 
     // settingsRunCommandChannel
-    std::unique_ptr<IReadOnlyChannel> SharpChannel::makeStdIO(const StdChannelSettings& settings ) {
-        return std::make_unique<StdComunicator>(settings);
+    std::unique_ptr<IReadOnlyChannel> SharpChannel::makeStdIO(const StdComunicatorSettings& settings ) {
+        return StdComunicator::getObject(settings);
     }
 
     std::unique_ptr<IReadOnlyChannel> SharpChannel::makeSystemCommand(const RunCommandSettings& settings ) {
-        return std::make_unique<RunCommand>(settings);
+        return RunCommand::getObject(settings);
     }
 
     std::unique_ptr<IChannel> SharpChannel::makeSocketServer(const SocketServerSettings& settings) {
-        return std::make_unique<SocketServer>(settings);
+        return SocketServer::getObject(settings);
     }
 }

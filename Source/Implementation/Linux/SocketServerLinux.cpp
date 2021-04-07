@@ -1,9 +1,7 @@
 #include <string>
-#include "SocketServer.hpp"
-#include "OsFlags.hpp"
-
-#ifdef WIN
-
+#include "SocketServerWin.hpp"
+#include "Settings.hpp"
+#include <memory>
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
@@ -21,6 +19,10 @@
 
 namespace cm {
 
+    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings& settings) {
+        return std::make_unique<SocketServerWin>(settings);
+    }
+
     namespace {
         WSADATA wsaData;
         int iResult;
@@ -35,11 +37,11 @@ namespace cm {
         char* recvbuf;
     }
 
-    SocketServer::~SocketServer() {
+    SocketServerWin::~SocketServerWin() {
         delete[] recvbuf;
     }
 
-    void SocketServer::init() {
+    void SocketServerWin::init() {
         // Initialize Winsock
         iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
         if (iResult != 0) {
@@ -93,7 +95,7 @@ namespace cm {
         freeaddrinfo(result);
     }
 
-    void SocketServer::run() {
+    void SocketServerWin::run() {
         
         guard.lock();
         iResult = listen(ListenSocket, SOMAXCONN);
@@ -154,7 +156,7 @@ namespace cm {
         return;
     }
     
-    bool SocketServer::sendDataImpl(const char* data, size_t lenght) {
+    bool SocketServerWin::sendDataImpl(const char* data, size_t lenght) {
         const std::lock_guard<std::mutex> lock(guard);
  
         iSendResult = ::send( ClientSocket, data, lenght, 0 );
@@ -168,8 +170,7 @@ namespace cm {
         return true;
     }
 
-    bool SocketServer::sendMessageImpl(const std::string& msg) {
+    bool SocketServerWin::sendMessageImpl(const std::string& msg) {
         return sendDataImpl(msg.c_str(), msg.length());
     }
 }
-#endif

@@ -3,7 +3,7 @@
 #include <string>
 
 namespace cm {
-    struct StdChannelSettings {
+    struct StdComunicatorSettings {
         std::string childProcessCommand;
     };
 
@@ -11,7 +11,7 @@ namespace cm {
         std::string command;
     };
 
-    struct  NamedPipeSettings
+    struct NamedPipeSettings
     {
         std::string pipeName;
         std::string subProcessCommand;

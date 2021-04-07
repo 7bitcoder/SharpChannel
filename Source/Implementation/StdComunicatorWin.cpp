@@ -1,9 +1,11 @@
 #include "StdComunicator.hpp"
-#include "OsFlags.hpp"
-
 
 namespace cm {
-    #ifdef WIN
+
+    std::unique_ptr<StdComunicator> StdComunicator::getObject(const StdComunicatorSettings& settings) {
+        return std::make_unique<StdComunicator>(settings);
+    }
+
     namespace {
         long runCommand(const std::string& command, CallbacksMap& map);
         void sendDataToCommand(const std::string& data);
@@ -204,5 +206,4 @@ namespace cm {
             ExitProcess(1);*/
         }
     }
-    #endif
 }

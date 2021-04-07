@@ -33,7 +33,7 @@ class Handler: public cm::IMessageObserver {
 
         cm::Control onMessageReceived(const std::string& messageReceived) override { return this->operator()(messageReceived);}
         void onCompleted() override { std::cout << "complete: " << std::endl; }
-        ~Handler() {}
+        virtual ~Handler() {}
 };
 
 int main(int, char**) {

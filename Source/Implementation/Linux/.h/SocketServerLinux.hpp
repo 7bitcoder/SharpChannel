@@ -4,12 +4,13 @@
 #include "Settings.hpp"
 #include "Control.hpp"
 #include "Channel.hpp"
+#include "SocketServer.hpp"
 
 namespace cm {
-    class SocketServer final: public Channel {
+    class SocketServerWin final: public SocketServer {
         public:
-            SocketServer(const SocketServerSettings& settings) { _settings = settings; init(); }
-            ~SocketServer();
+            SocketServerWin(const SocketServerSettings& settings) { _settings = settings; init(); }
+            virtual ~SocketServerWin();
             void init();
             void run() override;
 

@@ -31,7 +31,7 @@ namespace cm {
     
     class SharpChannel {
         public:
-            static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdChannelSettings& settings);
+            static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings& settings);
 
             static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings& settings);
 
