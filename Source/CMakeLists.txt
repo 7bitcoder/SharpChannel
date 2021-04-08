@@ -10,3 +10,7 @@ target_link_libraries(SharpChannel
     Channels
     Implementation
 )
+
+target_include_directories(SharpChannel PUBLIC
+    ".h"
+)

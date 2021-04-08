@@ -8,7 +8,8 @@ namespace cm {
     };
 
     struct RunCommandSettings {
-        std::string command;
+        std::string command = "";
+        bool captureOutput = false;
     };
 
     struct NamedPipeSettings

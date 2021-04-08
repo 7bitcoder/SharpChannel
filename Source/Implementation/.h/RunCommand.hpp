@@ -18,5 +18,4 @@ namespace cm {
         private:
             RunCommandSettings _settings;
     };
-
 }
