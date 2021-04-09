@@ -44,6 +44,16 @@ namespace cm {
     }
 
     void ReadOnlyChannel::nextAll(const std::string& msg) {
+        if(_eventLoop) {
+            _eventLoop->postChannelEvent([msg](){
+                
+            })
+        } else {
+            return nextAllImpl(msg);
+        }
+    } 
+
+    void ReadOnlyChannel::nextAllImpl(const std::string& msg) {
         for(auto& pair: getCallbacks()) {
             auto& callback = pair.second;
             if (callback->isData()) {
@@ -52,7 +62,7 @@ namespace cm {
                 callback->onMessageReceived(msg);
             }
         }
-    } 
+    }
 
     void ReadOnlyChannel::nextAll(const char* data, size_t lenght)   {
         std::unique_ptr<std::string> ptr;
@@ -70,7 +80,29 @@ namespace cm {
         }
     }   
 
+    void ReadOnlyChannel::nextAllImpl(const char* data, size_t lenght)   {
+        std::unique_ptr<std::string> ptr;
+        std::string f(data, lenght);
+        for(auto& pair: getCallbacks()) {
+            auto& callback = pair.second;
+            if (callback->isData()) {
+                callback->onDataReceived(data, lenght);
+            } else if (callback->isMessage()) {
+                if(!ptr) { // create if we need
+                    ptr = std::make_unique<std::string>(data, lenght);
+                }
+                callback->onMessageReceived(*ptr);
+            }
+        }
+    }  
+
     void ReadOnlyChannel::completeAll() {
+        for(auto& pair: getCallbacks()) {
+            pair.second->complete();
+        }
+    } 
+
+    void ReadOnlyChannel::completeAllImpl() {
         for(auto& pair: getCallbacks()) {
             pair.second->complete();
         }
@@ -84,5 +116,9 @@ namespace cm {
             return inserted.first->second;
         }
         return nullptr;
+    }
+
+    void ReadOnlyChannel::setChannelEventLoop(IChannelEventLoop& eventLoop) {
+        _eventLoop = &eventLoop;
     }
 }
