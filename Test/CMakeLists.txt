@@ -15,14 +15,14 @@ set(PLATFORM_TEST_SRC
 endif()
 
 
-add_executable(Test
+add_executable(Test 
     RunTests.cpp
     ${PLATFORM_TEST_SRC}
 )
 
-target_link_libraries(Test
+target_link_libraries(Test 
     SharpChannel
     CONAN_PKG::gtest
 )
 
-add_test(test-1 Test)
+add_test(test-1 bin/Test)

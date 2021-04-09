@@ -5,6 +5,7 @@
 #include <mutex>
 #include "Callback.hpp"
 #include "IReadOnlyChannel.hpp"
+#include "IChannelEventLoop.hpp"
 
 namespace cm {
     class ReadOnlyChannel: public virtual IReadOnlyChannel {
@@ -25,13 +26,18 @@ namespace cm {
 
             virtual ~ReadOnlyChannel() {}
         protected:
+            void setChannelEventLoop(IChannelEventLoop& eventLoop); 
             void completeAll();
             void nextAll(const std::string& msg);
             void nextAll(const char* data, size_t lenght);
             CallbacksMap& getCallbacks() { return *_callbacks; }
         private:
+            void completeAllImpl();
+            void nextAllImpl(const std::string& msg);
+            void nextAllImpl(const char* data, size_t lenght);
             std::shared_ptr<IUnsubscribable> subscribeImpl(std::shared_ptr<Callback> callback);
             std::shared_ptr<CallbacksMap> _callbacks;
             size_t _indexCnt = 0;
+            IChannelEventLoop* _eventLoop = nullptr;
     };
 }

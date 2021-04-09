@@ -15,6 +15,7 @@ TEST (RunCommand, WithCapture) {
     };
 
     comunicator->subscribe(onMessageReceived);
+    comunicator->run();
 }
 
 TEST (RunCommand, WithoutCapture) { 
@@ -24,9 +25,10 @@ TEST (RunCommand, WithoutCapture) {
     auto comunicator = cm::SharpChannel::makeSystemCommand(settings);
 
     auto onMessageReceived = [] (const std::string& msg) {
-        EXPECT_EQ(msg, "1");
+        EXPECT_EQ(msg, "0");
         return cm::Control::Ok;
     };
 
     comunicator->subscribe(onMessageReceived);
+    comunicator->run();
 }
