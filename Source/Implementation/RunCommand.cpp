@@ -13,14 +13,16 @@ namespace cm
 
     void RunCommand::run()
     {
+        std::string result;
         try {
-            auto result = std::system(_settings.command.c_str());
-            auto strRes = std::to_string(result);
-            nextAll(strRes);
-            completeAll();
+            auto resultInt = std::system(_settings.command.c_str());
+            result = std::to_string(resultInt);
+            nextAll(result);
         } catch (std::exception& e) {
             errorAll(e);
+            throw;
         }
+        completeAll();
     }
 
     void RunCommand::finish()

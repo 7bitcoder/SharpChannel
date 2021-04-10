@@ -30,7 +30,7 @@ namespace cm
 
     void Callback::onError(const std::exception& error) {
         if(_onError) {
-            onError(error);
+            _onError(error);
         }
     }
 

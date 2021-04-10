@@ -24,14 +24,47 @@ TEST(ChannelBehaviour, Unsubscription)
     settings.command = " ";
     auto comunicator = cm::SharpChannel::makeSystemCommand(settings);
 
-    auto onMessageReceived = [](const std::string &msg) {
-        throw std::exception();
+    bool sw = false;
+    auto onMessageReceived = [&sw](const std::string &msg) {
+        sw = true;
     };
 
     auto ubsubscriber = comunicator->subscribe(onMessageReceived);
     ubsubscriber->unsubscribe();
+    comunicator->run();
+    
+    EXPECT_FALSE(sw);
+}
 
-    EXPECT_NO_THROW(comunicator->run());
+TEST(ChannelBehaviour, Error)
+{
+    cm::RunCommandSettings settings;
+    settings.command = " ";
+    auto comunicator = cm::SharpChannel::makeSystemCommand(settings);
+
+    bool onMessageReceiveSw = false, onCompleteSw = false,  onErrorSw = false;
+    
+    auto onMessageReceived = [&onMessageReceiveSw](const std::string &msg) {
+        onMessageReceiveSw = true;
+        throw std::runtime_error("myMessage");
+    };
+
+    auto onComplete = [&onCompleteSw]() {
+        onCompleteSw = true;
+    };
+
+    auto onError = [&onErrorSw](const std::exception &error) {
+        onErrorSw = true;
+        EXPECT_STRCASEEQ(error.what(), "myMessage");
+    };
+
+    auto ubsubscriber = comunicator->subscribe(onMessageReceived, onComplete, onError);
+
+    EXPECT_ANY_THROW(comunicator->run());
+    
+    EXPECT_TRUE(onMessageReceiveSw);
+    EXPECT_FALSE(onCompleteSw);
+    EXPECT_TRUE(onErrorSw);
 }
 
 TEST(ChannelBehaviour, Parralel)
