@@ -3,15 +3,13 @@
 #include <functional>
 #include <map>
 #include <mutex>
-#include "Callback.hpp"
 #include "IReadOnlyChannel.hpp"
 #include "IChannelEventLoop.hpp"
+#include "CallbacksMap.hpp"
 
 namespace cm {
     class ReadOnlyChannel: public virtual IReadOnlyChannel {
         public:
-            ReadOnlyChannel() { _callbacks = std::make_shared<CallbacksMap>(); }
-
             std::shared_ptr<IUnsubscribable> subscribe(const onCompleted& onCompleted) final;
 
             std::shared_ptr<IUnsubscribable> subscribe(const OnMessageReceived& onMessageReceived) final;
@@ -24,20 +22,14 @@ namespace cm {
             std::shared_ptr<IUnsubscribable> subscribe(IDataObserver& observer) final;
             std::shared_ptr<IUnsubscribable> subscribe(IObserver& observer) final;
 
+            void setChannelEventLoop(IChannelEventLoop* eventLoop); 
             virtual ~ReadOnlyChannel() {}
         protected:
-            void setChannelEventLoop(IChannelEventLoop& eventLoop); 
             void completeAll();
             void nextAll(const std::string& msg);
-            void nextAll(const char* data, size_t lenght);
-            CallbacksMap& getCallbacks() { return *_callbacks; }
+            void nextAll(const std::vector<char>& data);
         private:
-            void completeAllImpl();
-            void nextAllImpl(const std::string& msg);
-            void nextAllImpl(const char* data, size_t lenght);
-            std::shared_ptr<IUnsubscribable> subscribeImpl(std::shared_ptr<Callback> callback);
-            std::shared_ptr<CallbacksMap> _callbacks;
-            size_t _indexCnt = 0;
+            CallbacksMap _callbacksMap;
             IChannelEventLoop* _eventLoop = nullptr;
     };
 }

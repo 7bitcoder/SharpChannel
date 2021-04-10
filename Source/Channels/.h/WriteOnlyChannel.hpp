@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <functional>
 #include <map>
 #include <thread>
@@ -10,13 +11,13 @@ namespace cm {
     class WriteOnlyChannel: public virtual IWriteOnlyChannel {
         public:
             bool sendMessage(const std::string& msg) final;
-            bool sendData(const char* data, size_t lenght) final;
+            bool sendData(const std::vector<char>& data) final;
 
             virtual bool sendMessageImpl(const std::string& msg) = 0;
-            virtual bool sendDataImpl(const char* data, size_t lenght) = 0;
+            virtual bool sendDataImpl(const std::vector<char>& data) = 0;
 
             virtual ~WriteOnlyChannel() {}
         private:
-            std::mutex guard;
+            std::mutex _guard;
     };
 }

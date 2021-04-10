@@ -1,14 +1,10 @@
 #pragma once
 #include <iostream>
-#include <map>
 #include "IUnsubscribable.hpp"
 #include "Control.hpp"
 #include "IReadOnlyChannel.hpp"
 
 namespace cm {
-    class Callback;
-    using CallbacksMap = std::map<size_t, std::shared_ptr<Callback>>;
-
     class Callback final: public IUnsubscribable {
         public:
             // getInfo
@@ -17,28 +13,21 @@ namespace cm {
             bool isComplete() { return bool(_onCompleted); }
             // callable
             Control onMessageReceived(const std::string& msg);
-            Control onDataReceived(const char* data, size_t lenght);
+            Control onDataReceived(const std::vector<char>& data);
             void complete();
 
             // initialization
-            Callback(std::shared_ptr<CallbacksMap> map, const onCompleted& onCompleted);
-            
-            Callback(std::shared_ptr<CallbacksMap> map, const OnMessageReceived& onMessageReceived);
-            Callback(std::shared_ptr<CallbacksMap> map, const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted);
+            Callback(const std::function<bool()>& unsubscriber, const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted);
 
-            Callback(std::shared_ptr<CallbacksMap> map, const OnDataReceived& onDataReceived);
-            Callback(std::shared_ptr<CallbacksMap> map, const OnDataReceived& onDataReceived, const onCompleted& onCompleted);
+            Callback(const std::function<bool()>& unsubscriber, const OnDataReceived& onDataReceived, const onCompleted& onCompleted);
 
-            void setIdentifier(size_t identifier) { _identifier = identifier; }
-            
             bool unsunscribe();
 
             virtual ~Callback() {}
         private:
-            size_t _identifier;
             OnMessageReceived _onMessageReceived;
             OnDataReceived _onDataReceived;
             onCompleted _onCompleted;
-            std::shared_ptr<CallbacksMap> _map;
+            const std::function<bool()>& _unsubscriber;
     };
 }

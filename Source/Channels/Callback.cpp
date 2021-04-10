@@ -4,8 +4,8 @@
 
 namespace cm {
     bool Callback::unsunscribe() {
-        if(_map) {
-            return _map->erase(_identifier) == 1;
+        if(_unsubscriber) {
+            return _unsubscriber();
         }
         return false;
     }
@@ -17,9 +17,9 @@ namespace cm {
         return Control::Stop;
     }
 
-    Control Callback::onDataReceived(const char* data, size_t lenght) {
+    Control Callback::onDataReceived(const std::vector<char>& data) {
         if(_onDataReceived) {
-            return _onDataReceived(data, lenght);
+            return _onDataReceived(data);
         }
         return Control::Stop;
     }
@@ -30,18 +30,9 @@ namespace cm {
         }
     }
 
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, const onCompleted& onCompleted)
-        : _map(map), _onCompleted(std::move(onCompleted)) {}
+    Callback::Callback(const std::function<bool()>& unsubscriber, const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted)
+        : _unsubscriber(unsubscriber), _onMessageReceived(std::move(onMessageReceived)), _onCompleted(std::move(onCompleted)) {}
 
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, const OnMessageReceived& onMessageReceived)
-        : _map(map), _onMessageReceived(std::move(onMessageReceived)) {}
-
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, const OnMessageReceived& onMessageReceived, const onCompleted& onCompleted)
-        : _map(map), _onMessageReceived(std::move(onMessageReceived)), _onCompleted(std::move(onCompleted)) {}
-
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, const OnDataReceived& onDataReceived)
-        : _map(map), _onDataReceived(std::move(onDataReceived)) {}
-
-    Callback::Callback(std::shared_ptr<CallbacksMap> map, const OnDataReceived& onDataReceived, const onCompleted& onCompleted)
-        : _map(map), _onDataReceived(std::move(onDataReceived)), _onCompleted(std::move(onCompleted)) {}
+    Callback::Callback(const std::function<bool()>& unsubscriber, const OnDataReceived& onDataReceived, const onCompleted& onCompleted)
+        : _unsubscriber(unsubscriber), _onDataReceived(std::move(onDataReceived)), _onCompleted(std::move(onCompleted)) {}
 }

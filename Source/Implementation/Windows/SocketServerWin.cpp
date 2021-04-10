@@ -19,8 +19,10 @@
 
 namespace cm {
 
-    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings& settings) {
-        return std::make_unique<SocketServerWin>(settings);
+    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings& settings, IChannelEventLoop* eventLoop) {
+        auto comunicator = std::make_unique<SocketServerWin>(settings);
+        comunicator->setChannelEventLoop(eventLoop);
+        return comunicator;
     }
 
     namespace {
@@ -156,9 +158,15 @@ namespace cm {
         return;
     }
     
-    bool SocketServerWin::sendDataImpl(const char* data, size_t lenght) {
-        const std::lock_guard<std::mutex> lock(guard);
- 
+    bool SocketServerWin::sendDataImpl(const std::vector<char>& data) {
+        return sendData(data.data(), data.size());
+    }
+
+    bool SocketServerWin::sendMessageImpl(const std::string& msg) {
+        return sendData(msg.c_str(), msg.length());
+    }
+
+    bool SocketServerWin::sendData(const char* data, const size_t lenght) {
         iSendResult = ::send( ClientSocket, data, lenght, 0 );
         if (iSendResult == SOCKET_ERROR) {
             printf("send failed with error: %d\n", WSAGetLastError());
@@ -170,7 +178,4 @@ namespace cm {
         return true;
     }
 
-    bool SocketServerWin::sendMessageImpl(const std::string& msg) {
-        return sendDataImpl(msg.c_str(), msg.length());
-    }
 }

@@ -11,6 +11,7 @@
 #include "IReadOnlyChannel.hpp"
 #include "IWriteOnlyChannel.hpp"
 #include "IUnsubscribable.hpp"
+#include "IChannelEventLoop.hpp"
 
 namespace cm {
     class ChannelException: public std::exception {
@@ -31,10 +32,10 @@ namespace cm {
     
     class SharpChannel {
         public:
-            static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings& settings);
+            static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings& settings, IChannelEventLoop* eventLoop = nullptr);
 
-            static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings& settings);
+            static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings& settings, IChannelEventLoop* eventLoop = nullptr);
 
-            static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings& settings);
+            static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings& settings, IChannelEventLoop* eventLoop = nullptr);
     };
 }

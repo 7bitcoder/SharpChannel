@@ -8,7 +8,7 @@
 namespace cm {
     class StdComunicator final: public ReadOnlyChannel {
         public:
-            static std::unique_ptr<StdComunicator> getObject(const StdComunicatorSettings& settings);
+            static std::unique_ptr<StdComunicator> getObject(const StdComunicatorSettings& settings, IChannelEventLoop* eventLoop);
 
             StdComunicator(const StdComunicatorSettings& settings) { _settings = settings; }
             virtual ~StdComunicator() {}

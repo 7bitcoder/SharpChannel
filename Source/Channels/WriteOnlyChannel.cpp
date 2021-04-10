@@ -3,12 +3,12 @@
 namespace cm {
 
     bool WriteOnlyChannel::sendMessage(const std::string& msg) {
-        const std::lock_guard<std::mutex> lock(guard);
+        const std::lock_guard<std::mutex> lock(_guard);
         return sendMessageImpl(msg);
     }
 
-    bool WriteOnlyChannel::sendData(const char* data, size_t lenght) {
-        const std::lock_guard<std::mutex> lock(guard);
-        return sendDataImpl(data, lenght);
+    bool WriteOnlyChannel::sendData(const std::vector<char>& data) {
+        const std::lock_guard<std::mutex> lock(_guard);
+        return sendDataImpl(data);
     }
 }

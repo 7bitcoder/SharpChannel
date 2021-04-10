@@ -156,7 +156,7 @@ namespace cm {
         return;
     }
     
-    bool SocketServerWin::sendDataImpl(const char* data, size_t lenght) {
+    bool SocketServerWin::sendDataImpl(const std::vector<char>& data) {
         const std::lock_guard<std::mutex> lock(guard);
  
         iSendResult = ::send( ClientSocket, data, lenght, 0 );

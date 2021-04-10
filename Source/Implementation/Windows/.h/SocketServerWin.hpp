@@ -15,8 +15,9 @@ namespace cm {
             void run() override;
 
             bool sendMessageImpl(const std::string& msg) override;
-            bool sendDataImpl(const char* data, size_t lenght) override;
+            bool sendDataImpl(const std::vector<char>& data) override;
         private:
+            bool sendData(const char* data, const size_t lenght);
             std::mutex guard;
             SocketServerSettings _settings;
     };

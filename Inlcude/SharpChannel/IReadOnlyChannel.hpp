@@ -10,7 +10,7 @@
 namespace cm {
 
     using OnMessageReceived = std::function<Control(const std::string&)>;
-    using OnDataReceived = std::function<Control(const char*, size_t)>;
+    using OnDataReceived = std::function<Control(const std::vector<char>&)>;
     using onCompleted = std::function<void(void)>;
    
     struct IReadOnlyChannel: public virtual IRunnable {

@@ -2,17 +2,19 @@
 
 namespace cm {
 
-    std::unique_ptr<StdComunicator> StdComunicator::getObject(const StdComunicatorSettings& settings) {
-        return std::make_unique<StdComunicator>(settings);
+    std::unique_ptr<StdComunicator> StdComunicator::getObject(const StdComunicatorSettings& settings, IChannelEventLoop* eventLoop) {
+        auto comunicator = std::make_unique<StdComunicator>(settings);
+        comunicator->setChannelEventLoop(eventLoop);
+        return comunicator;
     }
 
     namespace {
-        long runCommand(const std::string& command, CallbacksMap& map);
+        long runCommand(const std::string& command);
         void sendDataToCommand(const std::string& data);
     }
 
     void StdComunicator::run() {
-        runCommand(_settings.childProcessCommand, getCallbacks());
+        runCommand(_settings.childProcessCommand);
     }
 
     #include <windows.h> 
@@ -34,7 +36,7 @@ namespace cm {
         bool ReadFromPipe(std::string& data); 
         void ErrorExit(const char*); 
         
-        long runCommand(const std::string& command, CallbacksMap& map) { 
+        long runCommand(const std::string& command) { 
             SECURITY_ATTRIBUTES saAttr; 
             
             printf("\n->Start of parent execution.\n");
@@ -85,9 +87,9 @@ namespace cm {
                     break;
                 } 
 
-                for(auto& next: map) {
-                    auto result = next.second->onMessageReceived(msg);
-                }
+                //for(auto& next: map) {
+               //     auto result = next.second->onMessageReceived(msg);
+               // }
             }
             
             // The remaining open handles are cleaned up when this process terminates. 

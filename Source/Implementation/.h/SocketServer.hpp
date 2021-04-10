@@ -9,7 +9,7 @@
 namespace cm {
     class SocketServer: public Channel {
         public:
-            static std::unique_ptr<SocketServer> getObject(const SocketServerSettings& settings);
+            static std::unique_ptr<SocketServer> getObject(const SocketServerSettings& settings, IChannelEventLoop* eventLoop);
             
             virtual ~SocketServer() {}
     };
