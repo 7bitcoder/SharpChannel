@@ -5,6 +5,7 @@ add_library(Channels
     WriteOnlyChannel.cpp
     Callback.cpp
     CallbacksMap.cpp
+    Unsubscriber.cpp
 )
 
 target_include_directories(Channels PUBLIC

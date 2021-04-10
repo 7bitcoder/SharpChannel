@@ -4,15 +4,6 @@
 
 namespace cm
 {
-    bool Callback::unsunscribe()
-    {
-        if (_unsubscriber)
-        {
-            return _unsubscriber();
-        }
-        return false;
-    }
-
     Control Callback::onMessageReceived(const std::string &msg)
     {
         if (_onMessageReceived)
@@ -31,7 +22,7 @@ namespace cm
         return Control::Stop;
     }
 
-    void Callback::complete()
+    void Callback::onComplete()
     {
         if (_onCompleted)
         {
@@ -39,9 +30,15 @@ namespace cm
         }
     }
 
-    Callback::Callback(const std::function<bool()> &unsubscriber, const OnMessageReceived &onMessageReceived, const onCompleted &onCompleted)
-        : _unsubscriber(unsubscriber), _onMessageReceived(std::move(onMessageReceived)), _onCompleted(std::move(onCompleted)) {}
+    void Callback::onError(const std::exception& error) {
+        if(_onError) {
+            onError(error);
+        }
+    }
 
-    Callback::Callback(const std::function<bool()> &unsubscriber, const OnDataReceived &onDataReceived, const onCompleted &onCompleted)
-        : _unsubscriber(unsubscriber), _onDataReceived(std::move(onDataReceived)), _onCompleted(std::move(onCompleted)) {}
+    Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
+        : _onMessageReceived(std::move(onMessageReceived)), _onCompleted(std::move(onCompleted)), _onError(std::move(onError)) {}
+
+    Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
+        : _onDataReceived(std::move(onDataReceived)), _onCompleted(std::move(onCompleted)), _onError(std::move(onError)) {}
 }

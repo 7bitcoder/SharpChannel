@@ -2,36 +2,35 @@
 
 namespace cm
 {
-    std::shared_ptr<Callback> CallbacksMap::insert(const OnDataReceived &onDataReceived, const onCompleted &onCompleted)
+    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        auto index = currentIndex++;
-        auto unsubscriber = [this, index]() {
-            return remove(index);
-        };
-        auto callback = std::make_shared<Callback>(unsubscriber, onDataReceived, onCompleted);
-        return insertImpl(callback, index);
+        auto callback = std::make_shared<Callback>(onDataReceived, onCompleted, onError);
+        return insertCallback(callback);
     }
 
-    std::shared_ptr<Callback> CallbacksMap::insert(const OnMessageReceived &onMessageReceived, const onCompleted &onCompleted)
+    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        auto index = currentIndex++;
-        auto unsubscriber = [this, index]() {
-            return remove(index);
-        };
-        auto callback = std::make_shared<Callback>(unsubscriber, onMessageReceived, onCompleted);
-        return insertImpl(callback, index);
+        auto callback = std::make_shared<Callback>(onMessageReceived, onCompleted, onError);
+        return insertCallback(callback);
     }
 
-    std::shared_ptr<Callback> CallbacksMap::insertImpl(std::shared_ptr<Callback> callback, size_t index)
+    std::unique_ptr<Unsubscriber> CallbacksMap::insertCallback(std::shared_ptr<Callback> callback)
     {
+        auto index = currentIndex++;
         auto inserted = _map.insert(std::make_pair(index, callback));
         if (inserted.second)
         {
-            return inserted.first->second;
+            auto unsubscriber = [this, index]() {
+                return remove(index);
+            };
+            return std::make_unique<Unsubscriber>(unsubscriber);
         }
-        return nullptr;
+        else
+        {
+            return nullptr;
+        }
     }
 
     bool CallbacksMap::remove(const size_t index)
@@ -45,7 +44,7 @@ namespace cm
         const std::lock_guard<std::mutex> lock(_guard);
         for (auto &pair : _map)
         {
-            pair.second->complete();
+            pair.second->onComplete();
         }
     }
 
@@ -90,6 +89,15 @@ namespace cm
                 }
                 callback->onMessageReceived(*ptr);
             }
+        }
+    }
+
+    void CallbacksMap::errorAll(const std::exception &error)
+    {
+        const std::lock_guard<std::mutex> lock(_guard);
+        for (auto &pair : _map)
+        {
+            pair.second->onError(error);
         }
     }
 }

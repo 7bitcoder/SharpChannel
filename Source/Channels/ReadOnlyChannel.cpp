@@ -7,49 +7,42 @@
 namespace cm
 {
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const onCompleted &onCompleted)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap.insert(OnMessageReceived(), onCompleted);
+        return _callbacksMap.insert(OnMessageReceived(), onCompleted, onError);
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap.insert(onMessageReceived);
+        return _callbacksMap.insert(onMessageReceived, onCompleted, onError);
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived, const onCompleted &onCompleted)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap.insert(onMessageReceived, onCompleted);
+        return _callbacksMap.insert(onDataReceived, onCompleted, onError);
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IMessageObserver &observer)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IMessageObserver &observer)
     {
         OnMessageReceived onMessageReceived = std::bind(&IMessageObserver::onMessageReceived, &observer, std::placeholders::_1);
-        onCompleted onCompleted = std::bind(&IMessageObserver::onCompleted, &observer);
-        return _callbacksMap.insert(onMessageReceived, onCompleted);
+        OnCompleted onCompleted = std::bind(&IMessageObserver::onCompleted, &observer);
+        OnError onError = std::bind(&IMessageObserver::onError, &observer);
+        return _callbacksMap.insert(onMessageReceived, onCompleted, onError);
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived)
-    {
-        return _callbacksMap.insert(onDataReceived);
-    }
-
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived, const onCompleted &onCompleted)
-    {
-        return _callbacksMap.insert(onDataReceived, onCompleted);
-    }
-
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IDataObserver &observer)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IDataObserver &observer)
     {
         OnDataReceived onDataReceived = std::bind(&IDataObserver::onDataReceived, &observer, std::placeholders::_1);
-        onCompleted onCompleted = std::bind(&IDataObserver::onCompleted, &observer);
-        return _callbacksMap.insert(onDataReceived, onCompleted);
+        OnCompleted onCompleted = std::bind(&IDataObserver::onCompleted, &observer);
+        OnError onError = std::bind(&IDataObserver::onError, &observer);
+        return _callbacksMap.insert(onDataReceived, onCompleted, onError);
     }
 
-    std::shared_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IObserver &observer)
+    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IObserver &observer)
     {
-        onCompleted onCompleted = std::bind(&IObserver::onCompleted, &observer);
-        return _callbacksMap.insert(OnDataReceived(), onCompleted);
+        OnCompleted onCompleted = std::bind(&IObserver::onCompleted, &observer);
+        OnError onError = std::bind(&IObserver::onError, &observer);
+        return _callbacksMap.insert(OnDataReceived(), onCompleted, onError);
     }
 
     void ReadOnlyChannel::nextAll(const std::string &msg)
@@ -91,6 +84,19 @@ namespace cm
         else
         {
             return _callbacksMap.completeAll();
+        }
+    }
+
+    void ReadOnlyChannel::errorAll(const std::exception& error) {
+        if (_eventLoop)
+        {
+            _eventLoop->postChannelEvent([this, error]() {
+                _callbacksMap.errorAll(error);
+            });
+        }
+        else
+        {
+            return _callbacksMap.errorAll(error);
         }
     }
 

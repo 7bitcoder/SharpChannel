@@ -6,7 +6,7 @@
 
 namespace cm
 {
-    class Callback final : public IUnsubscribable
+    class Callback
     {
     public:
         // getInfo
@@ -16,21 +16,19 @@ namespace cm
         // callable
         Control onMessageReceived(const std::string &msg);
         Control onDataReceived(const std::vector<char> &data);
-        void complete();
+        void onComplete();
+        void onError(const std::exception& error); 
 
         // initialization
-        Callback(const std::function<bool()> &unsubscriber, const OnMessageReceived &onMessageReceived, const onCompleted &onCompleted);
+        Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError);
 
-        Callback(const std::function<bool()> &unsubscriber, const OnDataReceived &onDataReceived, const onCompleted &onCompleted);
+        Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError);
 
-        bool unsunscribe();
-
-        virtual ~Callback() {}
-
+        ~Callback() {}
     private:
         OnMessageReceived _onMessageReceived;
         OnDataReceived _onDataReceived;
-        onCompleted _onCompleted;
-        const std::function<bool()> &_unsubscriber;
+        OnError _onError;
+        OnCompleted _onCompleted;
     };
 }
