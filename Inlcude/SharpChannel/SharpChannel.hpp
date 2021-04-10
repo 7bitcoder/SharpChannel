@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <memory>
-#include "Control.hpp"
+
 #include "Settings.hpp"
 #include "IRunnable.hpp"
 #include "IObserver.hpp"

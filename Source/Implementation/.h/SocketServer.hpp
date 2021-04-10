@@ -2,7 +2,7 @@
 #include <mutex>
 #include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "Control.hpp"
+
 #include "GetObject.hpp"
 #include "Channel.hpp"
 

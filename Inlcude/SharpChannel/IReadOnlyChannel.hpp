@@ -5,13 +5,13 @@
 #include "IDataObserver.hpp"
 #include "IRunnable.hpp"
 #include "IUnsubscribable.hpp"
-#include "Control.hpp"
+
 
 namespace cm
 {
 
-    using OnMessageReceived = std::function<Control(const std::string &)>;
-    using OnDataReceived = std::function<Control(const std::vector<char> &)>;
+    using OnMessageReceived = std::function<void(const std::string &)>;
+    using OnDataReceived = std::function<void(const std::vector<char> &)>;
     using OnCompleted = std::function<void(void)>;
     using OnError = std::function<void(const std::exception &)>;
 

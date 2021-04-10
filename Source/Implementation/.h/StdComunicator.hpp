@@ -1,7 +1,6 @@
 #pragma once
 #include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "Control.hpp"
 #include "GetObject.hpp"
 #include "ReadOnlyChannel.hpp"
 

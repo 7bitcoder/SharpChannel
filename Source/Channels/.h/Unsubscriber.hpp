@@ -9,7 +9,7 @@ namespace cm
     {
     public:
         Unsubscriber(const std::function<bool()> &unsubscriber);
-        bool unsunscribe();
+        bool unsubscribe();
 
         virtual ~Unsubscriber() {}
     private:

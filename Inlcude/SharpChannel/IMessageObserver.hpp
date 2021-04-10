@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "Control.hpp"
 #include "IObserver.hpp"
 
 namespace cm
@@ -8,7 +7,7 @@ namespace cm
 
     struct IMessageObserver : public virtual IObserver
     {
-        virtual Control onMessageReceived(const std::string &message) = 0;
+        virtual void onMessageReceived(const std::string &message) = 0;
 
         virtual ~IMessageObserver() {}
     };

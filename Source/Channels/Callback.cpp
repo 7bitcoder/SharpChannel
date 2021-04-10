@@ -4,22 +4,20 @@
 
 namespace cm
 {
-    Control Callback::onMessageReceived(const std::string &msg)
+    void Callback::onMessageReceived(const std::string &msg)
     {
         if (_onMessageReceived)
         {
             return _onMessageReceived(msg);
-        }
-        return Control::Stop;
+        };
     }
 
-    Control Callback::onDataReceived(const std::vector<char> &data)
+    void Callback::onDataReceived(const std::vector<char> &data)
     {
         if (_onDataReceived)
         {
             return _onDataReceived(data);
         }
-        return Control::Stop;
     }
 
     void Callback::onComplete()
@@ -37,8 +35,8 @@ namespace cm
     }
 
     Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
-        : _onMessageReceived(std::move(onMessageReceived)), _onCompleted(std::move(onCompleted)), _onError(std::move(onError)) {}
+        : _onMessageReceived(onMessageReceived), _onCompleted(onCompleted), _onError(onError) {}
 
     Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
-        : _onDataReceived(std::move(onDataReceived)), _onCompleted(std::move(onCompleted)), _onError(std::move(onError)) {}
+        : _onDataReceived(onDataReceived), _onCompleted(onCompleted), _onError(onError) {}
 }

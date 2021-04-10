@@ -5,7 +5,7 @@ namespace cm {
     Unsubscriber::Unsubscriber(const std::function<bool()> &unsubscriber)
         : _unsubscriber(std::move(unsubscriber)) {}
 
-    bool Unsubscriber::unsunscribe()
+    bool Unsubscriber::unsubscribe()
     {
         if (_unsubscriber)
         {

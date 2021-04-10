@@ -3,13 +3,14 @@
 if(OS_WINDOWS)
 
 set(PLATFORM_TEST_SRC
-    Windows/Test.cpp
+    Windows/RunCommandTest.cpp
+    Windows/ChannelBehaviourTest.cpp
 )
 
 elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD OR OS_NETBSD)
 
 set(PLATFORM_TEST_SRC
-    Linux/Test.cpp
+    Linux/RunCommandTest.cpp
 )
 
 endif()

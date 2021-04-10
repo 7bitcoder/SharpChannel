@@ -12,9 +12,10 @@ namespace cm
         std::mutex _guard;
         std::condition_variable _cond;
         std::queue<std::function<void(void)>> _eventQueue;
+        bool isCompleted = false;
 
     public:
-        std::function<void()> &WaitForEventAndRun()
+        bool WaitForEventAndRun()
         {
             std::unique_lock<std::mutex> mlock(_guard);
             while (_eventQueue.empty())
@@ -22,13 +23,20 @@ namespace cm
                 _cond.wait(mlock);
             }
             auto &event = _eventQueue.front();
-            event();
-            _eventQueue.pop();
+            if (event) {
+                event();
+                _eventQueue.pop();
+                return true;
+            } else {
+                _eventQueue.pop();
+                return false;
+            }
         }
 
         void postChannelEvent(const std::function<void(void)> event) final
         {
             std::unique_lock<std::mutex> mlock(_guard);
+            isCompleted = true;
             _eventQueue.push(event);
             mlock.unlock();     // unlock before notificiation to minimize mutex con
             _cond.notify_one(); // notify one waiting thread

@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "IUnsubscribable.hpp"
-#include "Control.hpp"
 #include "IReadOnlyChannel.hpp"
 
 namespace cm
@@ -14,8 +13,8 @@ namespace cm
         bool isMessage() { return bool(_onMessageReceived); }
         bool isComplete() { return bool(_onCompleted); }
         // callable
-        Control onMessageReceived(const std::string &msg);
-        Control onDataReceived(const std::vector<char> &data);
+        void onMessageReceived(const std::string &msg);
+        void onDataReceived(const std::vector<char> &data);
         void onComplete();
         void onError(const std::exception& error); 
 

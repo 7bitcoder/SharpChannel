@@ -80,6 +80,9 @@ namespace cm
             _eventLoop->postChannelEvent([this]() {
                 _callbacksMap.completeAll();
             });
+
+            // send empty to inform that is finished
+            _eventLoop->postChannelEvent(std::function<void(void)>()); 
         }
         else
         {
