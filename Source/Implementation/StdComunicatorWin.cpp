@@ -1,28 +1,33 @@
 #include "StdComunicator.hpp"
 
-namespace cm {
+namespace cm
+{
 
-    std::unique_ptr<StdComunicator> StdComunicator::getObject(const StdComunicatorSettings& settings, IChannelEventLoop* eventLoop) {
+    std::unique_ptr<StdComunicator> StdComunicator::getObject(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop)
+    {
         auto comunicator = std::make_unique<StdComunicator>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    namespace {
-        long runCommand(const std::string& command);
-        void sendDataToCommand(const std::string& data);
+    namespace
+    {
+        long runCommand(const std::string &command);
+        void sendDataToCommand(const std::string &data);
     }
 
-    void StdComunicator::run() {
+    void StdComunicator::run()
+    {
         runCommand(_settings.childProcessCommand);
     }
 
-    #include <windows.h> 
-    #include <tchar.h>
-    #include <stdio.h> 
-    #include <strsafe.h>
-    #define BUFSIZE 4096
-    namespace {
+#include <windows.h>
+#include <tchar.h>
+#include <stdio.h>
+#include <strsafe.h>
+#define BUFSIZE 4096
+    namespace
+    {
 
         HANDLE g_hChildStd_IN_Rd = NULL;
         HANDLE g_hChildStd_IN_Wr = NULL;
@@ -30,156 +35,163 @@ namespace cm {
         HANDLE g_hChildStd_OUT_Wr = NULL;
 
         HANDLE g_hInputFile = NULL;
-        CHAR chBuf[BUFSIZE]; 
-        
-        void CreateChildProcess(const std::string& command); 
-        bool ReadFromPipe(std::string& data); 
-        void ErrorExit(const char*); 
-        
-        long runCommand(const std::string& command) { 
-            SECURITY_ATTRIBUTES saAttr; 
-            
+        CHAR chBuf[BUFSIZE];
+
+        void CreateChildProcess(const std::string &command);
+        bool ReadFromPipe(std::string &data);
+        void ErrorExit(const char *);
+
+        long runCommand(const std::string &command)
+        {
+            SECURITY_ATTRIBUTES saAttr;
+
             printf("\n->Start of parent execution.\n");
 
-            // Set the bInheritHandle flag so pipe handles are inherited. 
-            
-            saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-            saAttr.bInheritHandle = TRUE; 
-            saAttr.lpSecurityDescriptor = NULL; 
+            // Set the bInheritHandle flag so pipe handles are inherited.
 
-            // Create a pipe for the child process's STDOUT. 
-            
-            if ( !CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) ) 
-                ErrorExit("StdoutRd CreatePipe"); 
+            saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+            saAttr.bInheritHandle = TRUE;
+            saAttr.lpSecurityDescriptor = NULL;
+
+            // Create a pipe for the child process's STDOUT.
+
+            if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0))
+                ErrorExit("StdoutRd CreatePipe");
 
             // Ensure the read handle to the pipe for STDOUT is not inherited.
 
-            if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
-                ErrorExit("Stdout SetHandleInformation"); 
+            if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
+                ErrorExit("Stdout SetHandleInformation");
 
-            // Create a pipe for the child process's STDIN. 
-            
-            if (! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)) 
-                ErrorExit("Stdin CreatePipe"); 
+            // Create a pipe for the child process's STDIN.
 
-            // Ensure the write handle to the pipe for STDIN is not inherited. 
-            
-            if ( ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
-                ErrorExit("Stdin SetHandleInformation"); 
-            
-            // Create the child process. 
-            
+            if (!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0))
+                ErrorExit("Stdin CreatePipe");
+
+            // Ensure the write handle to the pipe for STDIN is not inherited.
+
+            if (!SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0))
+                ErrorExit("Stdin SetHandleInformation");
+
+            // Create the child process.
+
             CreateChildProcess(command);
 
-            // Get a handle to an input file for the parent. 
-            // This example assumes a plain text file and uses string output to verify data flow. 
-            
-            if (command.empty()) 
-                ErrorExit("Please specify an input file.\n"); 
+            // Get a handle to an input file for the parent.
+            // This example assumes a plain text file and uses string output to verify data flow.
 
-            // Write to the pipe that is the standard input for a child process. 
+            if (command.empty())
+                ErrorExit("Please specify an input file.\n");
+
+            // Write to the pipe that is the standard input for a child process.
             // Data is written to the pipe's buffers, so it is not necessary to wait
             // until the child process is running before writing data.
             while (true)
             {
                 std::string msg;
-                if(!ReadFromPipe(msg)) {
+                if (!ReadFromPipe(msg))
+                {
                     break;
-                } 
+                }
 
                 //for(auto& next: map) {
-               //     auto result = next.second->onMessageReceived(msg);
-               // }
+                //     auto result = next.second->onMessageReceived(msg);
+                // }
             }
-            
-            // The remaining open handles are cleaned up when this process terminates. 
-            // To avoid resource leaks in a larger application, close handles explicitly. 
 
-            return 0; 
-        } 
-        
-        void CreateChildProcess(const std::string& command) {
+            // The remaining open handles are cleaned up when this process terminates.
+            // To avoid resource leaks in a larger application, close handles explicitly.
+
+            return 0;
+        }
+
+        void CreateChildProcess(const std::string &command)
+        {
             // Create a child process that uses the previously created pipes for STDIN and STDOUT.
-            PROCESS_INFORMATION piProcInfo; 
+            PROCESS_INFORMATION piProcInfo;
             STARTUPINFO siStartInfo;
-            BOOL bSuccess = FALSE; 
-            
-            // Set up members of the PROCESS_INFORMATION structure. 
-            
-            ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
-            
-            // Set up members of the STARTUPINFO structure. 
+            BOOL bSuccess = FALSE;
+
+            // Set up members of the PROCESS_INFORMATION structure.
+
+            ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+            // Set up members of the STARTUPINFO structure.
             // This structure specifies the STDIN and STDOUT handles for redirection.
-            
-            ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
-            siStartInfo.cb = sizeof(STARTUPINFO); 
+
+            ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+            siStartInfo.cb = sizeof(STARTUPINFO);
             siStartInfo.hStdError = g_hChildStd_OUT_Wr;
             siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
             siStartInfo.hStdInput = g_hChildStd_IN_Rd;
             siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
-            
-            // Create the child process. 
-                
-            bSuccess = CreateProcess(NULL, 
-                (TCHAR*)command.c_str(),     // command line 
-                NULL,          // process security attributes 
-                NULL,          // primary thread security attributes 
-                TRUE,          // handles are inherited 
-                0,             // creation flags 
-                NULL,          // use parent's environment 
-                NULL,          // use parent's current directory 
-                &siStartInfo,  // STARTUPINFO pointer 
-                &piProcInfo);  // receives PROCESS_INFORMATION 
-            
-            // If an error occurs, exit the application. 
-            if ( ! bSuccess ) 
+
+            // Create the child process.
+
+            bSuccess = CreateProcess(NULL,
+                                     (TCHAR *)command.c_str(), // command line
+                                     NULL,                     // process security attributes
+                                     NULL,                     // primary thread security attributes
+                                     TRUE,                     // handles are inherited
+                                     0,                        // creation flags
+                                     NULL,                     // use parent's environment
+                                     NULL,                     // use parent's current directory
+                                     &siStartInfo,             // STARTUPINFO pointer
+                                     &piProcInfo);             // receives PROCESS_INFORMATION
+
+            // If an error occurs, exit the application.
+            if (!bSuccess)
                 ErrorExit("CreateProcess");
-            else 
+            else
             {
                 // Close handles to the child process and its primary thread.
                 // Some applications might keep these handles to monitor the status
-                // of the child process, for example. 
+                // of the child process, for example.
 
                 CloseHandle(piProcInfo.hProcess);
                 CloseHandle(piProcInfo.hThread);
-                
+
                 // Close handles to the stdin and stdout pipes no longer needed by the child process.
                 // If they are not explicitly closed, there is no way to recognize that the child process has ended.
-                
+
                 CloseHandle(g_hChildStd_OUT_Wr);
                 CloseHandle(g_hChildStd_IN_Rd);
             }
         }
-        
-        void sendDataToCommand(const std::string& data) {
+
+        void sendDataToCommand(const std::string &data)
+        {
 
             // Read from a file and write its contents to the pipe for the child's STDIN.
-            // Stop when there is no more data. 
-            DWORD dwWritten; 
+            // Stop when there is no more data.
+            DWORD dwWritten;
             BOOL bSuccess = FALSE;
-            
+
             bSuccess = WriteFile(g_hChildStd_IN_Wr, data.c_str(), data.length(), &dwWritten, NULL);
-        } 
-            
-        bool ReadFromPipe(std::string& data) {
+        }
+
+        bool ReadFromPipe(std::string &data)
+        {
 
             // Read output from the child process's pipe for STDOUT
-            // and write to the parent process's pipe for STDOUT. 
-            // Stop when there is no more data. 
-            DWORD dwRead; 
+            // and write to the parent process's pipe for STDOUT.
+            // Stop when there is no more data.
+            DWORD dwRead;
             BOOL bSuccess = FALSE;
 
-            bSuccess = ReadFile( g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
-            if( !bSuccess ) return false;
+            bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+            if (!bSuccess)
+                return false;
 
             chBuf[dwRead] = '\0';
             data = chBuf;
             return true;
-        } 
-        
-        void ErrorExit(const char* lpszFunction) {
+        }
 
-            // Format a readable error message, display a message box, 
+        void ErrorExit(const char *lpszFunction)
+        {
+
+            // Format a readable error message, display a message box,
             // and exit from the application.
             /*LPVOID lpMsgBuf;
             LPVOID lpDisplayBuf;

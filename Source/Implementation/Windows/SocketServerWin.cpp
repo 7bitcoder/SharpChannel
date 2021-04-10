@@ -11,21 +11,24 @@
 #include <stdio.h>
 
 // Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
+#pragma comment(lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-namespace cm {
+namespace cm
+{
 
-    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings& settings, IChannelEventLoop* eventLoop) {
+    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings &settings, IChannelEventLoop *eventLoop)
+    {
         auto comunicator = std::make_unique<SocketServerWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    namespace {
+    namespace
+    {
         WSADATA wsaData;
         int iResult;
 
@@ -36,24 +39,28 @@ namespace cm {
         struct addrinfo hints;
 
         int iSendResult;
-        char* recvbuf;
+        char *recvbuf;
     }
 
-    SocketServerWin::~SocketServerWin() {
+    SocketServerWin::~SocketServerWin()
+    {
         delete[] recvbuf;
     }
 
-    void SocketServerWin::init() {
+    void SocketServerWin::init()
+    {
         // Initialize Winsock
-        iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-        if (iResult != 0) {
+        iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (iResult != 0)
+        {
             printf("WSAStartup failed with error: %d\n", iResult);
             return;
         }
 
         recvbuf = new char[_settings.receiveBufferSize];
-        
-        if (recvbuf == nullptr) {
+
+        if (recvbuf == nullptr)
+        {
             return;
         }
 
@@ -61,7 +68,7 @@ namespace cm {
         ZeroMemory(&hints, sizeof(hints));
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
-        hints.ai_protocol =  useTcp ? IPPROTO_TCP : IPPROTO_UDP;
+        hints.ai_protocol = useTcp ? IPPROTO_TCP : IPPROTO_UDP;
         hints.ai_flags = AI_PASSIVE;
 
         // Resolve the server address and port
@@ -69,7 +76,8 @@ namespace cm {
         auto portNumberStr = std::to_string(portNumber);
         PCSTR port = (portNumber == 0) ? DEFAULT_PORT : TEXT(portNumberStr.c_str());
         iResult = getaddrinfo(NULL, port, &hints, &result);
-        if ( iResult != 0 ) {
+        if (iResult != 0)
+        {
             printf("getaddrinfo failed with error: %d\n", iResult);
             WSACleanup();
             return;
@@ -77,7 +85,8 @@ namespace cm {
 
         // Create a SOCKET for connecting to server
         ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-        if (ListenSocket == INVALID_SOCKET) {
+        if (ListenSocket == INVALID_SOCKET)
+        {
             //printf("socket failed with error: %ld\n", WSAGetLastError());
             freeaddrinfo(result);
             WSACleanup();
@@ -85,8 +94,9 @@ namespace cm {
         }
 
         // Setup the TCP listening socket
-        iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-        if (iResult == SOCKET_ERROR) {
+        iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+        if (iResult == SOCKET_ERROR)
+        {
             printf("bind failed with error: %d\n", WSAGetLastError());
             freeaddrinfo(result);
             closesocket(ListenSocket);
@@ -97,11 +107,13 @@ namespace cm {
         freeaddrinfo(result);
     }
 
-    void SocketServerWin::run() {
-        
+    void SocketServerWin::run()
+    {
+
         guard.lock();
         iResult = listen(ListenSocket, SOMAXCONN);
-        if (iResult == SOCKET_ERROR) {
+        if (iResult == SOCKET_ERROR)
+        {
             printf("listen failed with error: %d\n", WSAGetLastError());
             closesocket(ListenSocket);
             WSACleanup();
@@ -110,7 +122,8 @@ namespace cm {
 
         // Accept a client socket
         ClientSocket = accept(ListenSocket, NULL, NULL);
-        if (ClientSocket == INVALID_SOCKET) {
+        if (ClientSocket == INVALID_SOCKET)
+        {
             printf("accept failed with error: %d\n", WSAGetLastError());
             closesocket(ListenSocket);
             WSACleanup();
@@ -121,10 +134,12 @@ namespace cm {
         closesocket(ListenSocket);
         guard.unlock();
         // Receive until the peer shuts down the connection
-        do {
+        do
+        {
 
             iResult = recv(ClientSocket, recvbuf, _settings.receiveBufferSize, 0);
-            if (iResult > 0) {
+            if (iResult > 0)
+            {
                 printf("Bytes received: %d\n", iResult);
                 recvbuf[iResult] = '\0';
                 std::string msg(recvbuf);
@@ -132,7 +147,8 @@ namespace cm {
             }
             else if (iResult == 0)
                 printf("Connection closing...\n");
-            else  {
+            else
+            {
                 printf("recv failed with error: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
@@ -143,7 +159,8 @@ namespace cm {
 
         // shutdown the connection since we're done
         iResult = shutdown(ClientSocket, SD_SEND);
-        if (iResult == SOCKET_ERROR) {
+        if (iResult == SOCKET_ERROR)
+        {
             printf("shutdown failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
             WSACleanup();
@@ -157,18 +174,22 @@ namespace cm {
         completeAll();
         return;
     }
-    
-    bool SocketServerWin::sendDataImpl(const std::vector<char>& data) {
+
+    bool SocketServerWin::sendDataImpl(const std::vector<char> &data)
+    {
         return sendData(data.data(), data.size());
     }
 
-    bool SocketServerWin::sendMessageImpl(const std::string& msg) {
+    bool SocketServerWin::sendMessageImpl(const std::string &msg)
+    {
         return sendData(msg.c_str(), msg.length());
     }
 
-    bool SocketServerWin::sendData(const char* data, const size_t lenght) {
-        iSendResult = ::send( ClientSocket, data, lenght, 0 );
-        if (iSendResult == SOCKET_ERROR) {
+    bool SocketServerWin::sendData(const char *data, const size_t lenght)
+    {
+        iSendResult = ::send(ClientSocket, data, lenght, 0);
+        if (iSendResult == SOCKET_ERROR)
+        {
             printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
             WSACleanup();

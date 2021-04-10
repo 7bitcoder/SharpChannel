@@ -1,11 +1,13 @@
 #pragma once
 
-namespace cm {
+namespace cm
+{
 
-    struct IRunnable {
+    struct IRunnable
+    {
         virtual void run() = 0;
-        virtual void finish() {};
-        
+        virtual void finish(){};
+
         virtual ~IRunnable() {}
     };
 }

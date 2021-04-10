@@ -2,12 +2,15 @@
 #include <iostream>
 #include <string>
 
-namespace cm {
-    struct StdComunicatorSettings {
+namespace cm
+{
+    struct StdComunicatorSettings
+    {
         std::string childProcessCommand;
     };
 
-    struct RunCommandSettings {
+    struct RunCommandSettings
+    {
         std::string command = "";
         bool captureOutput = false;
     };
@@ -17,9 +20,11 @@ namespace cm {
         std::string pipeName;
         std::string subProcessCommand;
     };
-    
-    struct SocketServerSettings {
-        enum class SocketType {
+
+    struct SocketServerSettings
+    {
+        enum class SocketType
+        {
             Tcp,
             Udp
         };

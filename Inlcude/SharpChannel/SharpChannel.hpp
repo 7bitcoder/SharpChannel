@@ -13,29 +13,32 @@
 #include "IUnsubscribable.hpp"
 #include "IChannelEventLoop.hpp"
 
-namespace cm {
-    class ChannelException: public std::exception {
-        public:
-            explicit ChannelException(const char* message)
-                : msg_(message) {}
+namespace cm
+{
+    class ChannelException : public std::exception
+    {
+    public:
+        explicit ChannelException(const char *message)
+            : msg_(message) {}
 
-            explicit ChannelException(const std::string& message)
-                : msg_(message) {}
+        explicit ChannelException(const std::string &message)
+            : msg_(message) {}
 
-            virtual ~ChannelException() noexcept {}
+        virtual ~ChannelException() noexcept {}
 
-            virtual const char* what() const noexcept { return msg_.c_str(); }
+        virtual const char *what() const noexcept { return msg_.c_str(); }
 
-        protected:
-            std::string msg_;
+    protected:
+        std::string msg_;
     };
-    
-    class SharpChannel {
-        public:
-            static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings& settings, IChannelEventLoop* eventLoop = nullptr);
 
-            static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings& settings, IChannelEventLoop* eventLoop = nullptr);
+    class SharpChannel
+    {
+    public:
+        static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
-            static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings& settings, IChannelEventLoop* eventLoop = nullptr);
+        static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+
+        static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop = nullptr);
     };
 }

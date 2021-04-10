@@ -1,18 +1,22 @@
 #include <string>
 #include "RunCommand.hpp"
 
-namespace cm {
+namespace cm
+{
 
-    std::unique_ptr<RunCommand> RunCommand::getObject(const RunCommandSettings& settings, IChannelEventLoop* eventLoop) {
+    std::unique_ptr<RunCommand> RunCommand::getObject(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    {
         auto comunicator = std::make_unique<RunCommand>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    void RunCommand::run() {
-        std::streambuf* oldCoutStreamBuf;
+    void RunCommand::run()
+    {
+        std::streambuf *oldCoutStreamBuf;
         std::ostringstream strCout;
-        if(_settings.captureOutput) {
+        if (_settings.captureOutput)
+        {
             oldCoutStreamBuf = std::cout.rdbuf();
             std::cout.rdbuf(strCout.rdbuf());
         }
@@ -20,16 +24,19 @@ namespace cm {
         auto result = std::system(_settings.command.c_str());
         auto strRes = std::to_string(result);
 
-        if(_settings.captureOutput) {
+        if (_settings.captureOutput)
+        {
             nextAll(strCout.str());
-    	    std::cout.rdbuf(oldCoutStreamBuf);
-        } else {
+            std::cout.rdbuf(oldCoutStreamBuf);
+        }
+        else
+        {
             nextAll(strRes);
         }
         completeAll();
     }
 
-    void RunCommand::finish() {
-
+    void RunCommand::finish()
+    {
     }
 }

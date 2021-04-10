@@ -7,17 +7,20 @@
 #include <mutex>
 #include "IWriteOnlyChannel.hpp"
 
-namespace cm {
-    class WriteOnlyChannel: public virtual IWriteOnlyChannel {
-        public:
-            bool sendMessage(const std::string& msg) final;
-            bool sendData(const std::vector<char>& data) final;
+namespace cm
+{
+    class WriteOnlyChannel : public virtual IWriteOnlyChannel
+    {
+    public:
+        bool sendMessage(const std::string &msg) final;
+        bool sendData(const std::vector<char> &data) final;
 
-            virtual bool sendMessageImpl(const std::string& msg) = 0;
-            virtual bool sendDataImpl(const std::vector<char>& data) = 0;
+        virtual bool sendMessageImpl(const std::string &msg) = 0;
+        virtual bool sendDataImpl(const std::vector<char> &data) = 0;
 
-            virtual ~WriteOnlyChannel() {}
-        private:
-            std::mutex _guard;
+        virtual ~WriteOnlyChannel() {}
+
+    private:
+        std::mutex _guard;
     };
 }
