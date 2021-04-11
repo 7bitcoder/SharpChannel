@@ -1,22 +1,7 @@
-#include <string>
+#include <memory>
+#include <vector>
 #include "SocketServerWin.hpp"
 #include "Settings.hpp"
-#include <memory>
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-// Need to link with Ws2_32.lib
-#pragma comment(lib, "Ws2_32.lib")
-// #pragma comment (lib, "Mswsock.lib")
-
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-
 namespace cm
 {
 
@@ -25,21 +10,6 @@ namespace cm
         auto comunicator = std::make_unique<SocketServerWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
-    }
-
-    namespace
-    {
-        WSADATA wsaData;
-        int iResult;
-
-        SOCKET ListenSocket = INVALID_SOCKET;
-        SOCKET ClientSocket = INVALID_SOCKET;
-
-        struct addrinfo *result = NULL;
-        struct addrinfo hints;
-
-        int iSendResult;
-        char *recvbuf;
     }
 
     SocketServerWin::~SocketServerWin()
@@ -53,15 +23,14 @@ namespace cm
         iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (iResult != 0)
         {
-            printf("WSAStartup failed with error: %d\n", iResult);
-            return;
+            throw cm::ChannelException(std::string("WSAStartup failed with error: ") + std::to_string(iResult));
         }
 
         recvbuf = new char[_settings.receiveBufferSize];
 
         if (recvbuf == nullptr)
         {
-            return;
+            throw cm::ChannelException("Failed To alocate buffer memory");
         }
 
         bool useTcp = _settings.socketType == SocketServerSettings::SocketType::Tcp;
@@ -78,30 +47,27 @@ namespace cm
         iResult = getaddrinfo(NULL, port, &hints, &result);
         if (iResult != 0)
         {
-            printf("getaddrinfo failed with error: %d\n", iResult);
             WSACleanup();
-            return;
+            throw cm::ChannelException(std::string("getaddrinfo failed with error: ") + std::to_string(WSAGetLastError()));
         }
 
         // Create a SOCKET for connecting to server
         ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
         if (ListenSocket == INVALID_SOCKET)
         {
-            //printf("socket failed with error: %ld\n", WSAGetLastError());
             freeaddrinfo(result);
             WSACleanup();
-            return;
+            throw cm::ChannelException(std::string("socket failed with error: ") + std::to_string(WSAGetLastError()));
         }
 
         // Setup the TCP listening socket
         iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
         if (iResult == SOCKET_ERROR)
         {
-            printf("bind failed with error: %d\n", WSAGetLastError());
             freeaddrinfo(result);
             closesocket(ListenSocket);
             WSACleanup();
-            return;
+            throw cm::ChannelException(std::string("bind failed with error: ") + std::to_string(WSAGetLastError()));
         }
 
         freeaddrinfo(result);
@@ -109,70 +75,71 @@ namespace cm
 
     void SocketServerWin::run()
     {
-
-        guard.lock();
-        iResult = listen(ListenSocket, SOMAXCONN);
-        if (iResult == SOCKET_ERROR)
-        {
-            printf("listen failed with error: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
-            WSACleanup();
-            return;
-        }
-
-        // Accept a client socket
-        ClientSocket = accept(ListenSocket, NULL, NULL);
-        if (ClientSocket == INVALID_SOCKET)
-        {
-            printf("accept failed with error: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
-            WSACleanup();
-            return;
-        }
-
-        // No longer need server socket
-        closesocket(ListenSocket);
-        guard.unlock();
-        // Receive until the peer shuts down the connection
-        do
-        {
-
-            iResult = recv(ClientSocket, recvbuf, _settings.receiveBufferSize, 0);
-            if (iResult > 0)
+        try {
+            init();
+            guard.lock();
+            iResult = listen(ListenSocket, SOMAXCONN);
+            if (iResult == SOCKET_ERROR)
             {
-                printf("Bytes received: %d\n", iResult);
-                recvbuf[iResult] = '\0';
-                std::string msg(recvbuf);
-                nextAll(msg);
+                closesocket(ListenSocket);
+                WSACleanup();
+                throw cm::ChannelException(std::string("listen failed with error: ") + std::to_string(WSAGetLastError()));
             }
-            else if (iResult == 0)
-                printf("Connection closing...\n");
-            else
+
+            // Accept a client socket
+            ClientSocket = ::accept(ListenSocket, NULL, NULL);
+            if (ClientSocket == INVALID_SOCKET)
             {
-                printf("recv failed with error: %d\n", WSAGetLastError());
+                closesocket(ListenSocket);
+                WSACleanup();
+                throw cm::ChannelException(std::string("accept failed with error: ") + std::to_string(WSAGetLastError()));
+            }
+
+            // No longer need server socket
+            closesocket(ListenSocket);
+            guard.unlock();
+            // Receive until the peer shuts down the connection
+            do
+            {
+                iResult = recv(ClientSocket, recvbuf, _settings.receiveBufferSize, 0);
+                if (iResult > 0)
+                {
+                    recvbuf[iResult] = '\0';
+                    std::vector<char> vec(recvbuf, recvbuf + iResult);
+                    nextAll(vec);
+                }
+                else if (iResult == 0)
+                    break;
+                else
+                {
+                    closesocket(ClientSocket);
+                    WSACleanup();
+                    throw cm::ChannelException(std::string("recv failed with error: ") + std::to_string(WSAGetLastError()));
+                }
+
+            } while (iResult > 0);
+
+            // shutdown the connection since we're done
+            iResult = shutdown(ClientSocket, SD_SEND);
+            if (iResult == SOCKET_ERROR)
+            {
                 closesocket(ClientSocket);
                 WSACleanup();
-                return;
+                throw cm::ChannelException(std::string("shutdown failed with error: ") + std::to_string(WSAGetLastError()));
             }
 
-        } while (iResult > 0);
-
-        // shutdown the connection since we're done
-        iResult = shutdown(ClientSocket, SD_SEND);
-        if (iResult == SOCKET_ERROR)
-        {
-            printf("shutdown failed with error: %d\n", WSAGetLastError());
+            // cleanup
             closesocket(ClientSocket);
             WSACleanup();
-            return;
+
+            completeAll();
+        } catch(std::exception& e) {
+            errorAll(e);
+        } catch (...) {
+            errorAll(std::exception("generic Error ocured"));
         }
-
-        // cleanup
-        closesocket(ClientSocket);
-        WSACleanup();
-
-        completeAll();
-        return;
+        delete[] recvbuf;
+        recvbuf = nullptr;
     }
 
     bool SocketServerWin::sendDataImpl(const std::vector<char> &data)
@@ -190,12 +157,11 @@ namespace cm
         iSendResult = ::send(ClientSocket, data, lenght, 0);
         if (iSendResult == SOCKET_ERROR)
         {
-            printf("send failed with error: %d\n", WSAGetLastError());
+            // printf("send failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
             WSACleanup();
             return false;
         }
-        printf("Bytes sent: %d\n", iSendResult);
         return true;
     }
 
