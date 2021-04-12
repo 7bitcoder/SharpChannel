@@ -12,6 +12,7 @@ if(OS_WINDOWS)
 
     set(PLATFORM_SRC
         Windows/SocketServerWin.cpp
+        Windows/StdComunicatorWin.cpp
     )
 
 elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD OR OS_NETBSD)
