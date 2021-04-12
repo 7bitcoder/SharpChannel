@@ -28,7 +28,7 @@ namespace cm
     class SocketServerWin final : public SocketServer
     {
     public:
-        SocketServerWin(const SocketServerSettings &settings) { _settings = settings; }
+        SocketServerWin(const SocketServerSettings &settings) { _settings = settings; end = false; }
         virtual ~SocketServerWin();
         void init();
         void run() override;
@@ -44,9 +44,9 @@ namespace cm
         }
 
     private:
-        bool sendData(const char *data, const size_t lenght);
+        bool sendRawData(const char *data, const size_t lenght);
         std::mutex guard;
-        std::atomic_bool end = false;
+        std::atomic_bool end;
         SocketServerSettings _settings;
 
         WSADATA wsaData;

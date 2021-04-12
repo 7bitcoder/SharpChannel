@@ -149,24 +149,30 @@ namespace cm
 
     bool SocketServerWin::sendDataImpl(const std::vector<char> &data)
     {
-        return sendData(data.data(), data.size());
+        return sendRawData(data.data(), data.size());
     }
 
     bool SocketServerWin::sendMessageImpl(const std::string &msg)
     {
-        return sendData(msg.c_str(), msg.length());
+        return sendRawData(msg.c_str(), msg.length());
     }
 
-    bool SocketServerWin::sendData(const char *data, const size_t lenght)
+    bool SocketServerWin::sendRawData(const char *data, const size_t lenght)
     {
-        iSendResult = ::send(ClientSocket, data, lenght, 0);
-        if (iSendResult == SOCKET_ERROR)
+        const char *data_ptr = (const char*) data;
+        long int bytes_sent = 0;
+        size_t data_size = lenght;
+
+        while (data_size > 0)
         {
-            // printf("send failed with error: %d\n", WSAGetLastError());
-            closesocket(ClientSocket);
-            WSACleanup();
-            return false;
+            bytes_sent = ::send(ClientSocket, data_ptr, data_size, 0);
+            if (bytes_sent == SOCKET_ERROR)
+                return false;
+
+            data_ptr += bytes_sent;
+            data_size -= bytes_sent;
         }
+
         return true;
     }
 
