@@ -22,7 +22,7 @@ namespace cm {
     class SocketServerLinux final: public SocketServer {
         public:
             SocketServerLinux(const SocketServerSettings &settings) { _settings = settings; end = false; }
-            virtual ~SocketServerLinux();
+            ~SocketServerLinux();
             void init();
             void run() override;
 

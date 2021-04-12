@@ -11,7 +11,7 @@ namespace cm
         Unsubscriber(const std::function<bool()> &unsubscriber);
         bool unsubscribe();
 
-        virtual ~Unsubscriber() {}
+        ~Unsubscriber() {}
     private:
         const std::function<bool()> _unsubscriber;
     };

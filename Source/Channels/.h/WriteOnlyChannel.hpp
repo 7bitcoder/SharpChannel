@@ -18,7 +18,7 @@ namespace cm
         virtual bool sendMessageImpl(const std::string &msg) = 0;
         virtual bool sendDataImpl(const std::vector<char> &data) = 0;
 
-        virtual ~WriteOnlyChannel() {}
+        ~WriteOnlyChannel() {}
 
     private:
         std::mutex _guard;

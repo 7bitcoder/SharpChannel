@@ -1,6 +1,7 @@
 #include <string>
 #include "RunCommand.hpp"
 #include "SharpChannel.hpp"
+#include "ReadOnlyChannel.hpp"
 
 namespace cm
 {

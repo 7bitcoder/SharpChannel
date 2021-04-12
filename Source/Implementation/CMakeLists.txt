@@ -28,7 +28,8 @@ elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD OR OS_NETBSD)
 endif()
 
 add_library(Implementation
-    ${SRC} ${PLATFORM_SRC}
+    ${SRC} 
+    ${PLATFORM_SRC}
 )
 
 target_include_directories(Implementation PUBLIC

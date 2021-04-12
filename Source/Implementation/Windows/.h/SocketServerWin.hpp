@@ -29,7 +29,7 @@ namespace cm
     {
     public:
         SocketServerWin(const SocketServerSettings &settings) { _settings = settings; end = false; }
-        virtual ~SocketServerWin();
+        ~SocketServerWin();
         void init();
         void run() override;
 

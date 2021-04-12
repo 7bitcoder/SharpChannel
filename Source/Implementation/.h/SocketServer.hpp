@@ -13,6 +13,6 @@ namespace cm
     public:
         static std::unique_ptr<SocketServer> getObject(const SocketServerSettings &settings, IChannelEventLoop *eventLoop);
 
-        virtual ~SocketServer() {}
+        ~SocketServer() {}
     };
 }

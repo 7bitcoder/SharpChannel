@@ -1,5 +1,4 @@
 #include "SharpChannel.hpp"
-#include "StdComunicator.hpp"
 #include "RunCommand.hpp"
 #include "SocketServer.hpp"
 namespace cm
@@ -8,7 +7,7 @@ namespace cm
     // settingsRunCommandChannel
     std::unique_ptr<IReadOnlyChannel> SharpChannel::makeStdIO(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop)
     {
-        return StdComunicator::getObject(settings, eventLoop);
+        return nullptr; //return StdComunicator::getObject(settings, eventLoop);
     }
 
     std::unique_ptr<IReadOnlyChannel> SharpChannel::makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)

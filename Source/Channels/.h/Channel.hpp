@@ -9,6 +9,6 @@ namespace cm
     struct Channel : public IChannel, public ReadOnlyChannel, public WriteOnlyChannel
     {
 
-        virtual ~Channel() {}
+        ~Channel() {}
     };
 }

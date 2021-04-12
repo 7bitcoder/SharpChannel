@@ -22,7 +22,7 @@ namespace cm
         std::unique_ptr<IUnsubscribable> subscribe(IObserver &observer) final;
 
         void setChannelEventLoop(IChannelEventLoop *eventLoop);
-        virtual ~ReadOnlyChannel() {}
+        ~ReadOnlyChannel() {}
 
     protected:
         void completeAll();
