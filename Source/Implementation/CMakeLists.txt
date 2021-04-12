@@ -1,4 +1,11 @@
 
+set( ChannelsSrc ) {
+    Channels/ReadOnlyChannel.cpp
+    Channels/WriteOnlyChannel.cpp
+    Channels/Callback.cpp
+    Channels/CallbacksMap.cpp
+    Channels/Unsubscriber.cpp
+}
 set(SRC 
     NamedPipe.cpp
     RunCommand.cpp

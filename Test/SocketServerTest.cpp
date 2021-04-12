@@ -3,6 +3,15 @@
 #include <gtest/gtest.h>
 #include "SharpChannel.hpp"
 #include "ChannelEventLoop.hpp"
+#include "Config.hpp"
+
+#ifdef SYSTEM_LINUX
+    std::string python = "python3";
+#elif SYSTEM_WINDOWS
+    std::string python = "python";
+#endif
+
+std::string tester = "socketServerTester.py";
 
 enum TestScenario {
     SimplePong = 1,
@@ -11,9 +20,7 @@ enum TestScenario {
 
 std::thread runPythonClient(TestScenario testScenairo, int port) {
     return std::thread([testScenairo, port](){
-        std::string cmd = "python socketServerTester.py ";
-        cmd += std::to_string(testScenairo) + " ";
-        cmd += std::to_string(port);
+        std::string cmd = python +  " " + tester + " "  + std::to_string(testScenairo) + " " + std::to_string(port);
         std::system(cmd.c_str());
     });
 }
