@@ -5,10 +5,10 @@
 #include "ChannelEventLoop.hpp"
 #include "Config.hpp"
 
-#ifdef SYSTEM_LINUX
-    std::string python = "python3";
-#elif SYSTEM_WINDOWS
+#if defined(SYSTEM_WINDOWS)
     std::string python = "python";
+#elif defined(SYSTEM_LINUX)
+    std::string python = "python3";
 #endif
 
 std::string tester = "socketServerTester.py";
