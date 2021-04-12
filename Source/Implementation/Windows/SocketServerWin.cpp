@@ -52,7 +52,7 @@ namespace cm
         }
 
         // Create a SOCKET for connecting to server
-        ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        ListenSocket = end ? INVALID_SOCKET : socket(result->ai_family, result->ai_socktype, result->ai_protocol);
         if (ListenSocket == INVALID_SOCKET)
         {
             freeaddrinfo(result);
@@ -61,7 +61,7 @@ namespace cm
         }
 
         // Setup the TCP listening socket
-        iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+        iResult = end ? SOCKET_ERROR : bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
         if (iResult == SOCKET_ERROR)
         {
             freeaddrinfo(result);
@@ -78,20 +78,22 @@ namespace cm
         try {
             init();
             guard.lock();
-            iResult = listen(ListenSocket, SOMAXCONN);
+            iResult = end ? SOCKET_ERROR : listen(ListenSocket, SOMAXCONN);
             if (iResult == SOCKET_ERROR)
             {
                 closesocket(ListenSocket);
                 WSACleanup();
+                guard.unlock();
                 throw cm::ChannelException(std::string("listen failed with error: ") + std::to_string(WSAGetLastError()));
             }
 
             // Accept a client socket
-            ClientSocket = ::accept(ListenSocket, NULL, NULL);
+            ClientSocket = end ? INVALID_SOCKET : ::accept(ListenSocket, NULL, NULL);
             if (ClientSocket == INVALID_SOCKET)
             {
                 closesocket(ListenSocket);
                 WSACleanup();
+                guard.unlock();
                 throw cm::ChannelException(std::string("accept failed with error: ") + std::to_string(WSAGetLastError()));
             }
 
@@ -135,8 +137,11 @@ namespace cm
             completeAll();
         } catch(std::exception& e) {
             errorAll(e);
+            throw;
         } catch (...) {
-            errorAll(std::exception("generic Error ocured"));
+            std::exception e("generic Error ocured");
+            errorAll(e);
+            throw e;
         }
         delete[] recvbuf;
         recvbuf = nullptr;

@@ -3,7 +3,8 @@ import sys
 from enum import Enum
 
 class TestScenario(Enum):
-    Simple = 1
+    SimplePong = 1
+    MessageReceive = 2
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server
@@ -15,9 +16,14 @@ if( len(sys.argv) >= 3):
 if( len(sys.argv) >= 4):
     exit(-1)
 
-if testScenario == TestScenario.Simple:
+if testScenario == TestScenario.SimplePong:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.sendall(b'Hello, world')
         data = s.recv(1024)
+
+if testScenario == TestScenario.MessageReceive:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        s.sendall(b'Hello, world')
     

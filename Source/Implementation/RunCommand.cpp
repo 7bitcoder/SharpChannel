@@ -21,6 +21,10 @@ namespace cm
         } catch (std::exception& e) {
             errorAll(e);
             throw;
+        } catch (...) {
+            std::exception e("generic Error ocured");
+            errorAll(e);
+            throw e;
         }
         completeAll();
     }

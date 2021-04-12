@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <atomic>
 #include "IRunnable.hpp"
 #include "Settings.hpp"
 #include "Channel.hpp"
@@ -36,6 +37,7 @@ namespace cm
         bool sendDataImpl(const std::vector<char> &data) override;
 
         void finish() override {
+            end = true;
             closesocket(ListenSocket);
             closesocket(ClientSocket);
             WSACleanup();
@@ -44,6 +46,7 @@ namespace cm
     private:
         bool sendData(const char *data, const size_t lenght);
         std::mutex guard;
+        std::atomic_bool end = false;
         SocketServerSettings _settings;
 
         WSADATA wsaData;

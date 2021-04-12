@@ -16,10 +16,17 @@ set(PLATFORM_TEST_SRC
 
 endif()
 
+set(CopyFiles 
+    ${CMAKE_CURRENT_SOURCE_DIR}/socketServerTester.py
+)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/socketServerTester.py
+file(COPY ${CopyFiles}
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
+
+file(COPY ${CopyFiles}
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 add_executable(Test 
     RunTests.cpp
@@ -31,4 +38,4 @@ target_link_libraries(Test
     CONAN_PKG::gtest
 )
 
-add_test(test-1 bin/Test)
+gtest_discover_tests(Test Tests PROPERTIES TIMEOUT 10)
