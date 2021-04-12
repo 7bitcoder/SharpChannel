@@ -105,14 +105,16 @@ TEST(SocketServer, NormalFinish)
     cm::SocketServerSettings settings;
     settings.port = 65125;
     auto comunicator = cm::SharpChannel::makeSocketServer(settings);
+        
+    bool gotMessage = false, completed = false;
+    auto onComplete = [&completed](){
+        completed = true;
+    };
+
+    comunicator->subscribe(onComplete);
 
     std::thread th([&comunicator](){
-        bool gotMessage = false, completed = false;
-        auto onComplete = [&completed](){
-        completed = true;
-        };
 
-        comunicator->subscribe(onComplete);
         try {
             comunicator->run();
         } catch(...) {}
