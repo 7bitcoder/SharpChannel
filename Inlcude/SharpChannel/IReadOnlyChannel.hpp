@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <functional>
+#include <memory>
 #include "IMessageObserver.hpp"
 #include "IDataObserver.hpp"
 #include "IRunnable.hpp"

@@ -7,10 +7,10 @@
 #include "SocketServer.hpp"
 
 namespace cm {
-    class SocketServerWin final: public SocketServer {
+    /*class SocketServerLinux final: public SocketServer {
         public:
-            SocketServerWin(const SocketServerSettings& settings) { _settings = settings; init(); }
-            virtual ~SocketServerWin();
+            SocketServerLinux(const SocketServerSettings& settings) { _settings = settings; init(); }
+            virtual ~SocketServerLinux();
             void init();
             void run() override;
 
@@ -19,5 +19,5 @@ namespace cm {
         private:
             std::mutex guard;
             SocketServerSettings _settings;
-    };
+    };*/
 }

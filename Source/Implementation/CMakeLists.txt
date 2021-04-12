@@ -2,7 +2,6 @@
 set(SRC 
     NamedPipe.cpp
     RunCommand.cpp
-    StdComunicatorWin.cpp
 )
 
 if(OS_WINDOWS)

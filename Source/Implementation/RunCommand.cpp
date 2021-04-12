@@ -1,5 +1,6 @@
 #include <string>
 #include "RunCommand.hpp"
+#include "SharpChannel.hpp"
 
 namespace cm
 {
@@ -22,7 +23,7 @@ namespace cm
             errorAll(e);
             throw;
         } catch (...) {
-            std::exception e("generic Error ocured");
+            ChannelException e("generic Error ocured");
             errorAll(e);
             throw e;
         }
