@@ -4,20 +4,16 @@
 #include "IRunnable.hpp"
 #include "Settings.hpp"
 #include "Channel.hpp"
-#include "SocketServer.hpp"
+#include "SocketClient.hpp"
 #include "SharpChannel.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-// #pragma comment (lib, "Mswsock.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
@@ -25,11 +21,12 @@
 
 namespace cm
 {
-    class SocketServerWin final : public SocketServer
+    class SocketClientWin final : public SocketClient
     {
     public:
-        SocketServerWin(const SocketServerSettings &settings) { _settings = settings; end = false; }
-        ~SocketServerWin();
+        SocketClientWin(const SocketClientSettings &settings) { _settings = settings; end = false; }
+        ~SocketClientWin();
+        void init();
         void run() override;
 
         bool sendMessageImpl(const std::string &msg) override;
@@ -37,8 +34,7 @@ namespace cm
 
         void finish() override {
             end = true;
-            closesocket(ListenSocket);
-            closesocket(ClientSocket);
+            closesocket(ConnectSocket);
             WSACleanup();
         }
 
@@ -46,18 +42,17 @@ namespace cm
         bool sendRawData(const char *data, const size_t lenght);
         std::mutex guard;
         std::atomic_bool end;
-        SocketServerSettings _settings;
+        SocketClientSettings _settings;
 
         WSADATA wsaData;
-        int iResult;
-
-        SOCKET ListenSocket = INVALID_SOCKET;
-        SOCKET ClientSocket = INVALID_SOCKET;
+        SOCKET ConnectSocket = INVALID_SOCKET;
 
         struct addrinfo *result = NULL;
+        struct addrinfo *ptr = NULL;
         struct addrinfo hints;
 
-        int iSendResult;
+        int iResult;
+        int recvbuflen = DEFAULT_BUFLEN;
         char *recvbuf;
     };
 }

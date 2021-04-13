@@ -1,23 +1,31 @@
 #include <memory>
 #include <vector>
-#include "SocketServerWin.hpp"
-#include "Settings.hpp"
+#include "SocketClientWin.hpp"
+#include "Settings.hpp"#include <windows.h>
+
+
+
+// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
+
 namespace cm
 {
 
-    std::unique_ptr<SocketServer> SocketServer::getObject(const SocketServerSettings &settings, IChannelEventLoop *eventLoop)
+    std::unique_ptr<SocketClient> SocketClient::getObject(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<SocketServerWin>(settings);
+        auto comunicator = std::make_unique<SocketClientWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    SocketServerWin::~SocketServerWin()
+    SocketClientWin::~SocketClientWin()
     {
         delete[] recvbuf;
     }
 
-    void SocketServerWin::run()
+    void SocketClientWin::run()
     {
         try {
             guard.lock();
@@ -36,18 +44,17 @@ namespace cm
                 throw cm::ChannelException("Failed To alocate buffer memory");
             }
 
-            bool useTcp = _settings.socketType == SocketServerSettings::SocketType::Tcp;
+            bool useTcp = _settings.socketType == SocketClientSettings::SocketType::Tcp;
             ZeroMemory(&hints, sizeof(hints));
-            hints.ai_family = AF_INET;
+            hints.ai_family = AF_UNSPEC;
             hints.ai_socktype = SOCK_STREAM;
             hints.ai_protocol = useTcp ? IPPROTO_TCP : IPPROTO_UDP;
-            hints.ai_flags = AI_PASSIVE;
 
             // Resolve the server address and port
             auto portNumber = _settings.port;
             auto portNumberStr = std::to_string(portNumber);
             PCSTR port = (portNumber == 0) ? DEFAULT_PORT : TEXT(portNumberStr.c_str());
-            iResult = getaddrinfo(NULL, port, &hints, &result);
+            iResult = getaddrinfo(_settings.address.c_str(), port, &hints, &result);
             if (iResult != 0)
             {
                 guard.unlock();
@@ -146,17 +153,17 @@ namespace cm
         recvbuf = nullptr;
     }
 
-    bool SocketServerWin::sendDataImpl(const std::vector<char> &data)
+    bool SocketClientWin::sendDataImpl(const std::vector<char> &data)
     {
         return sendRawData(data.data(), data.size());
     }
 
-    bool SocketServerWin::sendMessageImpl(const std::string &msg)
+    bool SocketClientWin::sendMessageImpl(const std::string &msg)
     {
         return sendRawData(msg.c_str(), msg.length());
     }
 
-    bool SocketServerWin::sendRawData(const char *data, const size_t lenght)
+    bool SocketClientWin::sendRawData(const char *data, const size_t lenght)
     {
         const char *data_ptr = (const char*) data;
         long int bytes_sent = 0;

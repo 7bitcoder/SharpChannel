@@ -18,6 +18,7 @@ if(OS_WINDOWS)
 
     set(PLATFORM_SRC
         Windows/SocketServerWin.cpp
+        Windows/SocketClientWin.cpp
         Windows/StdComunicatorWin.cpp
     )
 
