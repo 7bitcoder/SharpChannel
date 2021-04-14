@@ -43,6 +43,7 @@ namespace cm
         }
 
     private:
+        void init();
         bool sendRawData(const char *data, const size_t lenght);
         std::mutex guard;
         std::atomic_bool end;

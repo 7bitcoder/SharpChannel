@@ -25,7 +25,7 @@ namespace cm
         {
             throw cm::ChannelException("Failed To alocate buffer memory");
         }
-        time_t ticks; 
+        time_t ticks;
 
         bool useTcp = _settings.socketType == SocketServerSettings::SocketType::Tcp;
         listenfd = socket(AF_INET, SOCK_STREAM, useTcp ? IPPROTO_TCP : IPPROTO_UDP);
@@ -37,38 +37,50 @@ namespace cm
 
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-        serv_addr.sin_port = htons(_settings.port); 
+        serv_addr.sin_port = htons(_settings.port);
 
         ;
         //Bind
-        if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
+        if (bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
         {
             throw cm::ChannelException("bind failed");
         }
+
+        iResult = end ? -1 : listen(listenfd, 5);
+        if (iResult == -1)
+        {
+            guard.unlock();
+            throw cm::ChannelException("listen failed");
+        }
+
+        // Accept a client socket
+        connfd = end ? -1 : accept(listenfd, (struct sockaddr *)&client, (socklen_t *)&c);
+        if (connfd < 0)
+        {
+            guard.unlock();
+            throw cm::ChannelException("accept failed");
+        }
+
+        // No longer need server socket
+        close(listenfd);
     }
 
     void SocketServerLinux::run()
     {
-        try {
-            init();
+        try
+        {
             guard.lock();
-            iResult = end ? -1 : listen(listenfd, 5);
-            if (iResult == -1)
+
+            try
+            {
+                init();
+            }
+            catch (...)
             {
                 guard.unlock();
-                throw cm::ChannelException("listen failed");
+                throw;
             }
 
-            // Accept a client socket
-            connfd = end ? -1 : accept(listenfd, (struct sockaddr *)&client, (socklen_t*)&c);
-            if (connfd < 0)
-            {
-                guard.unlock();
-                throw cm::ChannelException("accept failed");
-            }
-            
-            // No longer need server socket
-            close(listenfd);
             guard.unlock();
             // Receive until the peer shuts down the connection
             do
@@ -91,10 +103,14 @@ namespace cm
             } while (iResult > 0);
 
             completeAll();
-        } catch(std::exception& e) {
+        }
+        catch (std::exception &e)
+        {
             errorAll(e);
             throw;
-        } catch (...) {
+        }
+        catch (...)
+        {
             ChannelException e("generic Error ocured");
             errorAll(e);
             throw e;
@@ -115,7 +131,7 @@ namespace cm
 
     bool SocketServerLinux::sendRawData(const char *data, const size_t lenght)
     {
-        const char *data_ptr = (const char*) data;
+        const char *data_ptr = (const char *)data;
         long int bytes_sent = 0;
         size_t data_size = lenght;
 

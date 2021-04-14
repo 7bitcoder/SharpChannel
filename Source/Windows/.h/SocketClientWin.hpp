@@ -14,31 +14,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-
 
 namespace cm
 {
     class SocketClientWin final : public SocketClient
     {
     public:
-        SocketClientWin(const SocketClientSettings &settings) { _settings = settings; end = false; }
+        SocketClientWin(const SocketClientSettings &settings)
+        {
+            _settings = settings;
+            end = false;
+        }
         ~SocketClientWin();
-        void init();
         void run() override;
 
         bool sendMessageImpl(const std::string &msg) override;
         bool sendDataImpl(const std::vector<char> &data) override;
 
-        void finish() override {
+        void finish() override
+        {
             end = true;
             closesocket(ConnectSocket);
             WSACleanup();
         }
 
     private:
+        void init();
         bool sendRawData(const char *data, const size_t lenght);
         std::mutex guard;
         std::atomic_bool end;
