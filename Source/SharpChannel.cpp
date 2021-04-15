@@ -1,6 +1,7 @@
 #include "SharpChannel.hpp"
 #include "RunCommand.hpp"
 #include "SocketServer.hpp"
+#include "SocketClient.hpp"
 namespace cm
 {
 
@@ -14,9 +15,14 @@ namespace cm
     {
         return RunCommand::getObject(settings, eventLoop);
     }
-
+        
     std::unique_ptr<IChannel> SharpChannel::makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop)
     {
         return SocketServer::getObject(settings, eventLoop);
+    }
+
+    std::unique_ptr<IChannel> SharpChannel::makeSocketClient(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
+    {
+        return SocketClient::getObject(settings, eventLoop);
     }
 }

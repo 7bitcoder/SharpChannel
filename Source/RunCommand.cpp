@@ -17,6 +17,7 @@ namespace cm
     {
         std::string result;
         try {
+            connectedAll();
             auto resultInt = std::system(_settings.command.c_str());
             result = std::to_string(resultInt);
             nextAll(result);

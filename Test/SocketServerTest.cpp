@@ -4,6 +4,7 @@
 #include "SharpChannel.hpp"
 #include "ChannelEventLoop.hpp"
 #include "Config.hpp"
+namespace {
 
 #if defined(SYSTEM_WINDOWS)
     std::string python = "python";
@@ -13,43 +14,49 @@
 
 std::string tester = "socketServerTester.py";
 
-enum TestScenario {
-    SimplePong = 1,
-    MessageReceive
-};
+    enum TestScenario {
+        SimplePong = 1,
+        MessageReceive
+    };
 
-std::thread runPythonClient(TestScenario testScenairo, int port) {
-    return std::thread([testScenairo, port](){
-        std::string cmd = python +  " " + tester + " "  + std::to_string(testScenairo) + " " + std::to_string(port);
-        std::system(cmd.c_str());
-    });
+    std::thread runPythonClient(TestScenario testScenairo, int port) {
+        return std::thread([testScenairo, port](){
+            std::string cmd = python +  " " + tester + " "  + std::to_string(testScenairo) + " " + std::to_string(port);
+            std::system(cmd.c_str());
+        });
+    }
+    class Example: public cm::IMessageObserver {
+        private:
+            bool completed = false;
+            bool error = false;
+            bool connected = false;
+            int received = 0;
+        public:
+            bool wasCompleted() { return completed; }
+            bool wasError() { return error; }
+            bool wasMessage() { return received > 0; }
+            bool wasConnected() { return connected; }
+            int messages() { return received; }
+
+            void onCompleted() override {
+                completed = true;
+            }
+
+            void onError(const std::exception& e) override {
+                error = true;
+            }
+
+            void onMessageReceived(const std::string& msg) override{
+                received++;
+            }
+
+            void onConnected() {
+                connected = true;
+            }
+
+            virtual ~Example() {}
+    };
 }
-class Example: public cm::IMessageObserver {
-    private:
-        bool completed = false;
-        bool error = false;
-        int received = 0;
-    public:
-        bool wasCompleted() { return completed; }
-        bool wasError() { return error; }
-        bool wasMessage() { return received > 0; }
-        int messages() { return received; }
-
-        void onCompleted() override {
-            completed = true;
-        }
-
-        void onError(const std::exception& e) override {
-            error = true;
-        }
-
-        void onMessageReceived(const std::string& msg) override{
-            received++;
-        }
-
-        virtual ~Example() {}
-};
-
 
 TEST(SocketServer, Subscription)
 {
@@ -59,7 +66,7 @@ TEST(SocketServer, Subscription)
 
     auto th = runPythonClient(TestScenario::SimplePong, settings.port);
     
-    bool gotMessage = false, completed = false;
+    bool gotMessage = false, completed = false, connected = false;
     
     auto onMessageReceived = [&comunicator, &gotMessage](const std::string &msg) {
         EXPECT_STRCASEEQ("Hello, world", msg.c_str());
@@ -67,16 +74,21 @@ TEST(SocketServer, Subscription)
         comunicator->sendMessage("finish");
     };
 
+    auto onConnected = [&connected]() {
+        connected = true;
+    };
+
     auto onComplete = [&completed](){
         completed = true;
     };
 
-    comunicator->subscribe(onMessageReceived, onComplete);
+    comunicator->subscribe(onMessageReceived, onConnected, onComplete);
     comunicator->run();
     
     
     EXPECT_TRUE(gotMessage);
     EXPECT_TRUE(completed);
+    EXPECT_TRUE(connected);
     th.join();
 }
 
@@ -134,7 +146,7 @@ TEST(SocketServer, Error)
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
     auto comunicator = cm::SharpChannel::makeSocketServer(settings);
-    bool onMessageReceiveSw = false, onCompleteSw = false,  onErrorSw = false;
+    bool onMessageReceiveSw = false, onCompleteSw = false,  onErrorSw = false, onConnectedSw = false;
     
     auto onMessageReceived = [&onMessageReceiveSw](const std::string &msg) {
         onMessageReceiveSw = true;
@@ -145,17 +157,22 @@ TEST(SocketServer, Error)
         onCompleteSw = true;
     };
 
+    auto onConnected = [&onConnectedSw]() {
+        onConnectedSw = true;
+    };
+
     auto onError = [&onErrorSw](const std::exception &error) {
         onErrorSw = true;
         EXPECT_STRCASEEQ(error.what(), "myMessage");
     };
 
-    auto ubsubscriber = comunicator->subscribe(onMessageReceived, onComplete, onError);
+    auto ubsubscriber = comunicator->subscribe(onMessageReceived, onConnected, onComplete, onError);
 
     EXPECT_ANY_THROW(comunicator->run());
     
     EXPECT_TRUE(onMessageReceiveSw);
     EXPECT_FALSE(onCompleteSw);
+    EXPECT_TRUE(onConnectedSw);
     EXPECT_TRUE(onErrorSw);
 
     th.join();
@@ -174,10 +191,10 @@ TEST(SocketServer, Parralel)
         EXPECT_TRUE(!msg.empty());
     };
 
-    auto onCompleted = [](){
+    auto onConnected = [](){
     };
 
-    comunicator->subscribe(onMessageReceived, onCompleted);
+    comunicator->subscribe(onMessageReceived, onConnected);
 
     std::thread thread([comunicator](){
         comunicator->run();
@@ -191,7 +208,7 @@ TEST(SocketServer, Parralel)
     thread.join();
     th.join();
     
-    EXPECT_EQ(loops, 2);
+    EXPECT_EQ(loops, 3);
 }
 
 TEST(SocketServer, ParralelFullDuplex)
@@ -208,10 +225,10 @@ TEST(SocketServer, ParralelFullDuplex)
         comunicator->sendMessage("sendExample");
     };
 
-    auto onCompleted = [](){
+    auto onConnected = [](){
     };
 
-    comunicator->subscribe(onMessageReceived, onCompleted);
+    comunicator->subscribe(onMessageReceived, onConnected);
 
     std::thread thread([comunicator](){
         comunicator->run();
@@ -225,7 +242,7 @@ TEST(SocketServer, ParralelFullDuplex)
     thread.join();
     th.join();
     
-    EXPECT_EQ(loops, 2);
+    EXPECT_EQ(loops, 3);
 }
 
 TEST(SocketServer, SubscriptionClass)
@@ -244,6 +261,7 @@ TEST(SocketServer, SubscriptionClass)
 
     EXPECT_TRUE(ex.wasCompleted());
     EXPECT_TRUE(ex.wasMessage());
+    EXPECT_TRUE(ex.wasConnected());
     EXPECT_FALSE(ex.wasError());
 }
 
@@ -264,6 +282,7 @@ TEST(SocketServer, UnsubscriptionClass)
     th.join();
 
     EXPECT_FALSE(ex.wasError());
+    EXPECT_FALSE(ex.wasConnected());
     EXPECT_FALSE(ex.wasCompleted());
     EXPECT_FALSE(ex.wasMessage());
 }
@@ -295,6 +314,7 @@ TEST(SocketServer, ErrorClass)
     th.join();
     
     EXPECT_FALSE(ex.wasCompleted());
+    EXPECT_TRUE(ex.wasConnected());
     EXPECT_TRUE(ex.wasMessage());
     EXPECT_TRUE(ex.wasError());
     EXPECT_EQ(ex.messages(), 1);
@@ -324,8 +344,9 @@ TEST(SocketServer, ParralelClass)
     }
     thread.join();
     th.join();
-    EXPECT_EQ(loops, 2);
+    EXPECT_EQ(loops, 3);
     EXPECT_TRUE(ex.wasCompleted());
+    EXPECT_TRUE(ex.wasConnected());
     EXPECT_TRUE(ex.wasMessage());
     EXPECT_FALSE(ex.wasError());
     EXPECT_EQ(ex.messages(), 1);
@@ -370,7 +391,8 @@ TEST(SocketServer, ParralelFullDuplexClass)
 
     EXPECT_TRUE(ex.wasCompleted());
     EXPECT_TRUE(ex.wasMessage());
+    EXPECT_TRUE(ex.wasConnected());
     EXPECT_FALSE(ex.wasError());
     EXPECT_EQ(ex.messages(), 1);
-    EXPECT_EQ(loops, 2);
+    EXPECT_EQ(loops, 3);
 }

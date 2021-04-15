@@ -2,17 +2,17 @@
 
 namespace cm
 {
-    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
+    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        auto callback = std::make_shared<Callback>(onDataReceived, onCompleted, onError);
+        auto callback = std::make_shared<Callback>(onDataReceived, onCompleted, onError, onConnected);
         return insertCallback(callback);
     }
 
-    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
+    std::unique_ptr<Unsubscriber> CallbacksMap::insert(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        auto callback = std::make_shared<Callback>(onMessageReceived, onCompleted, onError);
+        auto callback = std::make_shared<Callback>(onMessageReceived, onCompleted, onError, onConnected);
         return insertCallback(callback);
     }
 
@@ -45,6 +45,15 @@ namespace cm
         for (auto &pair : _map)
         {
             pair.second->onComplete();
+        }
+    }
+
+    void CallbacksMap::connectedAll()
+    {
+        const std::lock_guard<std::mutex> lock(_guard);
+        for (auto &pair : _map)
+        {
+            pair.second->onConnected();
         }
     }
 

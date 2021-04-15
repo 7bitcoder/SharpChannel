@@ -2,6 +2,7 @@
 
 set(CopyFiles 
     ${CMAKE_CURRENT_SOURCE_DIR}/socketServerTester.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/socketClientTester.py
 )
 
 file(COPY ${CopyFiles}
@@ -17,6 +18,7 @@ add_executable(Test
     RunCommandTest.cpp
     ChannelBehaviourTest.cpp
     SocketServerTest.cpp
+    SocketClientTest.cpp
 )
 
 target_link_libraries(Test 

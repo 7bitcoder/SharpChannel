@@ -99,6 +99,7 @@ namespace cm
             }
             
             guard.unlock();
+            connectedAll();
             // Receive until the peer shuts down the connection
             do
             {

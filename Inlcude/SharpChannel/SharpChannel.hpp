@@ -40,5 +40,7 @@ namespace cm
         static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
         static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+
+        static std::unique_ptr<IChannel> makeSocketClient(const SocketClientSettings &settings, IChannelEventLoop *eventLoop = nullptr);
     };
 }

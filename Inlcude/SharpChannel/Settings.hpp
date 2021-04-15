@@ -41,7 +41,7 @@ namespace cm
         };
         SocketType socketType = SocketType::Tcp;
         size_t port = 0; // chose default port
-        std::string address = "localhost";
+        std::string address = "127.0.0.1";
         size_t receiveBufferSize = 4096;
         size_t sendBufferSize = 4096;
     };

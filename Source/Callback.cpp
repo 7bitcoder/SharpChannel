@@ -28,15 +28,23 @@ namespace cm
         }
     }
 
+    void Callback::onConnected()
+    {
+        if (_onConnected)
+        {
+            _onConnected();
+        }
+    }
+
     void Callback::onError(const std::exception& error) {
         if(_onError) {
             _onError(error);
         }
     }
 
-    Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
-        : _onMessageReceived(onMessageReceived), _onCompleted(onCompleted), _onError(onError) {}
+    Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
+        : _onMessageReceived(onMessageReceived), _onCompleted(onCompleted), _onError(onError), _onConnected(onConnected) {}
 
-    Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
-        : _onDataReceived(onDataReceived), _onCompleted(onCompleted), _onError(onError) {}
+    Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
+        : _onDataReceived(onDataReceived), _onCompleted(onCompleted), _onError(onError), _onConnected(onConnected) {}
 }

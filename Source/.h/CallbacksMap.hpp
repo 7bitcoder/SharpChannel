@@ -13,11 +13,12 @@ namespace cm
     class CallbacksMap
     {
     public:
-        std::unique_ptr<Unsubscriber> insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
-        std::unique_ptr<Unsubscriber> insert(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
+        std::unique_ptr<Unsubscriber> insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError(), const OnConnected &onConnected = OnConnected());
+        std::unique_ptr<Unsubscriber> insert(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError(), const OnConnected &onConnected = OnConnected());
 
         bool remove(const size_t index);
         void completeAll();
+        void connectedAll();
         void nextAll(const std::string &msg);
         void nextAll(const std::vector<char> &data);
         void errorAll(const std::exception& error);
