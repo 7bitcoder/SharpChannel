@@ -4,7 +4,7 @@ set(SRC
     NamedPipe.cpp
     RunCommand.cpp
     ChannelObservable.cpp
-    WriteOnlyChannel.cpp
+    ChannelObserver.cpp
     Callback.cpp
     CallbacksMap.cpp
     Unsubscriber.cpp

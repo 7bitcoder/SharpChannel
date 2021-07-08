@@ -7,7 +7,7 @@ namespace cm
 
     struct IDataObserver 
     {
-        virtual void next(const std::vector<char> &data) = 0;
+        virtual bool next(const std::vector<char> &data) = 0;
 
         virtual ~IDataObserver() {}
     };
