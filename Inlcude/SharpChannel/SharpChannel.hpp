@@ -3,15 +3,11 @@
 #include <memory>
 
 #include "Settings.hpp"
-#include "IRunnable.hpp"
-#include "IObserver.hpp"
 #include "IMessageObserver.hpp"
-#include "IDataObserver.hpp"
-#include "IChannel.hpp"
-#include "IReadOnlyChannel.hpp"
-#include "IWriteOnlyChannel.hpp"
+#include "IChannelObservable.hpp"
 #include "IUnsubscribable.hpp"
 #include "IChannelEventLoop.hpp"
+#include "IRunCommand.hpp"
 
 namespace cm
 {
@@ -35,12 +31,12 @@ namespace cm
     class SharpChannel
     {
     public:
-        static std::unique_ptr<IReadOnlyChannel> makeStdIO(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+        //static std::unique_ptr<IChannelDataObserver> makeStdIO(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
-        static std::unique_ptr<IReadOnlyChannel> makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+        static std::unique_ptr<IRunCommand> makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
-        static std::unique_ptr<IChannel> makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+        //static std::unique_ptr<IChannelDataObserver> makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
-        static std::unique_ptr<IChannel> makeSocketClient(const SocketClientSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+        //static std::unique_ptr<IChannelDataObserver> makeSocketClient(const SocketClientSettings &settings, IChannelEventLoop *eventLoop = nullptr);
     };
 }

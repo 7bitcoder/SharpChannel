@@ -1,5 +1,5 @@
 #include <utility>
-#include "ReadOnlyChannel.hpp"
+#include "IChannelObserver.hpp"
 #include "Callback.hpp"
 
 namespace cm

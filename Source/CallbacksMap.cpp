@@ -22,8 +22,17 @@ namespace cm
         auto inserted = _map.insert(std::make_pair(index, callback));
         if (inserted.second)
         {
-            auto unsubscriber = [this, index]() {
-                return remove(index);
+            auto unsubscriber = [weakThis = weak_from_this(), index]()
+            {
+                auto weakThisShared = weakThis.lock();
+                if (weakThisShared)
+                {
+                    return weakThisShared->remove(index);
+                }
+                else
+                {
+                    // TODO throw exception;
+                }
             };
             return std::make_unique<Unsubscriber>(unsubscriber);
         }

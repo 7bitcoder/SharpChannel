@@ -4,11 +4,10 @@
 #include "Settings.hpp"
 
 #include "GetObject.hpp"
-#include "Channel.hpp"
 
 namespace cm
 {
-    class SocketServer : public Channel
+    class SocketServer 
     {
     public:
         static std::unique_ptr<SocketServer> getObject(const SocketServerSettings &settings, IChannelEventLoop *eventLoop);

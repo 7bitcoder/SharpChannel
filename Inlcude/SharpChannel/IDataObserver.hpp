@@ -1,14 +1,13 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "IObserver.hpp"
 
 namespace cm
 {
 
-    struct IDataObserver : public virtual IObserver
+    struct IDataObserver 
     {
-        virtual void onDataReceived(const std::vector<char> &data) = 0;
+        virtual void next(const std::vector<char> &data) = 0;
 
         virtual ~IDataObserver() {}
     };

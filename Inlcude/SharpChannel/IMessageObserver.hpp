@@ -1,13 +1,12 @@
 #pragma once
 #include <string>
-#include "IObserver.hpp"
 
 namespace cm
 {
 
-    struct IMessageObserver : public virtual IObserver
+    struct IMessageObserver 
     {
-        virtual void onMessageReceived(const std::string &message) = 0;
+        virtual void next(const std::string &message) = 0;
 
         virtual ~IMessageObserver() {}
     };

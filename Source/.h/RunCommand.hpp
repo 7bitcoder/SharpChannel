@@ -1,20 +1,20 @@
 #pragma once
-#include "IRunnable.hpp"
+#include "IRunCommand.hpp"
 #include "Settings.hpp"
-#include "ReadOnlyChannel.hpp"
+#include "ChannelObservable.hpp"
 #include "GetObject.hpp"
 
 namespace cm
 {
-    class RunCommand final : public ReadOnlyChannel
+    class RunCommand final : public ChannelObservable, public IRunCommand
     {
     public:
         static std::unique_ptr<RunCommand> getObject(const RunCommandSettings &settings, IChannelEventLoop *eventLoop);
         RunCommand(const RunCommandSettings &settings) : _settings(std::move(settings)) {}
         ~RunCommand() {}
 
-        void run() override;
-        void finish() override;
+        void run() final;
+        void finish() final;
 
     private:
         RunCommandSettings _settings;

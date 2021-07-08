@@ -15,10 +15,10 @@ file(COPY ${CopyFiles}
 
 add_executable(Test 
     RunTests.cpp
-    RunCommandTest.cpp
-    ChannelBehaviourTest.cpp
-    SocketServerTest.cpp
-    SocketClientTest.cpp
+    #RunCommandTest.cpp
+    #ChannelBehaviourTest.cpp
+    #SocketServerTest.cpp
+    #SocketClientTest.cpp
 )
 
 target_link_libraries(Test 

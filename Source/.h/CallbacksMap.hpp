@@ -10,7 +10,7 @@
 namespace cm
 {
 
-    class CallbacksMap
+    class CallbacksMap: public std::enable_shared_from_this<CallbacksMap>
     {
     public:
         std::unique_ptr<Unsubscriber> insert(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError(), const OnConnected &onConnected = OnConnected());

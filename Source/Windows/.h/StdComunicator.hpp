@@ -2,11 +2,11 @@
 #include "IRunnable.hpp"
 #include "Settings.hpp"
 #include "GetObject.hpp"
-#include "ReadOnlyChannel.hpp"
+#include "ChannelObservable.hpp"
 
 namespace cm
 {
-    class StdComunicator final : public ReadOnlyChannel
+    class StdComunicator final : public ChannelObservable, public IRunnable
     {
     public:
         static std::unique_ptr<StdComunicator> getObject(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop);

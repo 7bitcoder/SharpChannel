@@ -3,7 +3,6 @@
 #include <atomic>
 #include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "Channel.hpp"
 #include "SocketClient.hpp"
 #include "SharpChannel.hpp"
 

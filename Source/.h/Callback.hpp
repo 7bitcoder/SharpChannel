@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include "IUnsubscribable.hpp"
-#include "IReadOnlyChannel.hpp"
+#include "IChannelObservable.hpp"
 
 namespace cm
 {

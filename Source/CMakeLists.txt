@@ -3,7 +3,7 @@
 set(SRC 
     NamedPipe.cpp
     RunCommand.cpp
-    ReadOnlyChannel.cpp
+    ChannelObservable.cpp
     WriteOnlyChannel.cpp
     Callback.cpp
     CallbacksMap.cpp
@@ -17,9 +17,9 @@ if(OS_WINDOWS)
     )
 
     set(PLATFORM_SRC
-        Windows/SocketServerWin.cpp
-        Windows/SocketClientWin.cpp
-        Windows/StdComunicatorWin.cpp
+        #Windows/SocketServerWin.cpp
+        #Windows/SocketClientWin.cpp
+       # Windows/StdComunicatorWin.cpp
     )
 
 elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD OR OS_NETBSD)
