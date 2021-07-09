@@ -1,19 +1,12 @@
 #pragma once
-#include <iostream>
-#include <functional>
-#include <memory>
-#include "IMessageObservable.hpp"
-#include "IDataObservable.hpp"
-#include "IErrorObservable.hpp"
-#include "ICompleteObservable.hpp"
-#include "IUnsubscribable.hpp"
-#include "IChannelObserver.hpp"
+#include "IObservables.hpp"
+#include "IObservers.hpp"
 
 namespace cm
 {
     using OnConnected = std::function<void(void)>;
 
-    struct IChannelObservable: public IMessageObservable, public ICompleteObservable, public IErrorObservable, public IDataObservable
+    struct IReadOnlyChannel: public IMessageObservable, public ICompleteObservable, public IErrorObservable, public IDataObservable
     {
 
         virtual std::unique_ptr<IUnsubscribable> subscribe(const OnCompleted &onCompleted, const OnError &onError) = 0;
@@ -26,8 +19,9 @@ namespace cm
         virtual std::unique_ptr<IUnsubscribable> subscribe(ICompleteObserver &observer) = 0;
         virtual std::unique_ptr<IUnsubscribable> subscribe(IMessageObserver &observer) = 0;
 
-        virtual std::unique_ptr<IUnsubscribable> subscribe(IChannelObserver &observer) = 0;
+        virtual std::unique_ptr<IUnsubscribable> subscribe(IChannelDataObserver &observer) = 0;
+        virtual std::unique_ptr<IUnsubscribable> subscribe(IChannelMessageObserver &observer) = 0;
 
-        virtual ~IChannelObservable() {}
+        virtual ~IReadOnlyChannel() {}
     };
 }

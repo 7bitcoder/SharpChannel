@@ -11,9 +11,9 @@ namespace cm
     //    return nullptr; //return StdComunicator::getObject(settings, eventLoop);
     //}
 //
-    std::unique_ptr<IRunCommand> SharpChannel::makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    RunCommand::Ptr SharpChannel::makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
-        return RunCommand::getObject(settings, eventLoop);
+        return RunCommand::create(settings, eventLoop);
     }
     //    
     //std::unique_ptr<IChannel> SharpChannel::makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop)

@@ -8,6 +8,8 @@ namespace cm
     class Unsubscriber final : public IUnsubscribable
     {
     public:
+        using Ptr = std::unique_ptr<Unsubscriber>;
+
         Unsubscriber(const std::function<bool()> &unsubscriber);
         bool unsubscribe();
 

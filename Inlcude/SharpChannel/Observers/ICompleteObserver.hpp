@@ -3,7 +3,7 @@
 namespace cm
 {
 
-    struct ICompleteObserver
+    struct ICompleteObserver 
     {
         virtual void complete() = 0;
 

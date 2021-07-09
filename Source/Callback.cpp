@@ -1,6 +1,5 @@
 #include <utility>
-#include "IChannelObserver.hpp"
-#include "Callback.hpp"
+#include "Channels/Callback.hpp"
 
 namespace cm
 {

@@ -3,7 +3,7 @@
 set(SRC 
     NamedPipe.cpp
     RunCommand.cpp
-    ChannelObservable.cpp
+    ReadOnlyChannel.cpp
     ChannelObserver.cpp
     Callback.cpp
     CallbacksMap.cpp

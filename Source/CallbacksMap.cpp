@@ -1,4 +1,4 @@
-#include "CallbacksMap.hpp"
+#include "Channels/CallbacksMap.hpp"
 
 namespace cm
 {

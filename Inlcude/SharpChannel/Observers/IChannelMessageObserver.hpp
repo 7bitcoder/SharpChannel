@@ -1,7 +1,7 @@
 #pragma once
-#include "ICompleteObserver.hpp"
-#include "IErrorObserver.hpp"
-#include "IMessageObserver.hpp"
+#include "Observers/ICompleteObserver.hpp"
+#include "Observers/IErrorObserver.hpp"
+#include "Observers/IMessageObserver.hpp"
 
 namespace cm
 {

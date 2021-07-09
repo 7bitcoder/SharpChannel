@@ -1,11 +1,11 @@
 #include <string>
 #include "RunCommand.hpp"
-#include "SharpChannel.hpp"
+#include "ChannelException.hpp"
 
 namespace cm
 {
 
-    std::unique_ptr<RunCommand> RunCommand::getObject(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    RunCommand::Ptr RunCommand::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
         auto comunicator = std::make_unique<RunCommand>(settings);
         comunicator->setChannelEventLoop(eventLoop);

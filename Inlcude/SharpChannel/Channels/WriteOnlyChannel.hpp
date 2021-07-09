@@ -5,13 +5,15 @@
 #include <map>
 #include <thread>
 #include <mutex>
-#include "IChannelObserver.hpp"
+#include "Channels/IWriteOnlyChannel.hpp"
 
 namespace cm
 {
-    class ChannelObserver : public virtual IChannelObserver
+    class WriteOnlyChannel : public IWriteOnlyChannel
     {
     public:
+        using Ptr = std::unique_ptr<WriteOnlyChannel>;
+
         bool next(const std::string &msg) final;
         bool next(const std::vector<char> &data) final;
 

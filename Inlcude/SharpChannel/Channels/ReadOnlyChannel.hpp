@@ -3,15 +3,17 @@
 #include <functional>
 #include <map>
 #include <mutex>
-#include "IChannelObservable.hpp"
-#include "IChannelEventLoop.hpp"
-#include "CallbacksMap.hpp"
+#include "Channels/IReadOnlyChannel.hpp"
+#include "Channels/IChannelEventLoop.hpp"
+#include "Channels/CallbacksMap.hpp"
 
 namespace cm
 {
-    class ChannelObservable : public virtual IChannelObservable
+    class ReadOnlyChannel : public IReadOnlyChannel
     {
     public:
+        using Ptr = std::unique_ptr<ReadOnlyChannel>;
+
         std::unique_ptr<IUnsubscribable> subscribe(const OnMessageReceived &onMessageReceived) final;
         std::unique_ptr<IUnsubscribable> subscribe(const OnDataReceived &onDataReceived) final;
         std::unique_ptr<IUnsubscribable> subscribe(const OnCompleted &onCompleted) final;
@@ -27,10 +29,11 @@ namespace cm
         std::unique_ptr<IUnsubscribable> subscribe(ICompleteObserver &observer) final;
         std::unique_ptr<IUnsubscribable> subscribe(IMessageObserver &observer) final;
 
-        std::unique_ptr<IUnsubscribable> subscribe(IChannelObserver &observer) final;
+        std::unique_ptr<IUnsubscribable> subscribe(IChannelDataObserver &observer) final;
+        std::unique_ptr<IUnsubscribable> subscribe(IChannelMessageObserver &observer) final;
 
         void setChannelEventLoop(IChannelEventLoop *eventLoop);
-        ~ChannelObservable() {}
+        ~ReadOnlyChannel() {}
 
     protected:
         void completeAll();

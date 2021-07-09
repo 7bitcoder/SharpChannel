@@ -1,10 +1,12 @@
 #pragma once
 #include <iostream>
 #include "IUnsubscribable.hpp"
-#include "IChannelObservable.hpp"
+#include "IObservables.hpp"
 
 namespace cm
 {
+    using OnConnected = std::function<void()>;
+    
     class Callback
     {
     public:
