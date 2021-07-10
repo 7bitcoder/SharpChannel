@@ -7,6 +7,8 @@ namespace cm
 {
     struct IChannelMessageObservable : public ICompleteObservable, public IErrorObservable, public IMessageObservable
     {
+        using Ptr = std::shared_ptr<IChannelMessageObservable>;
+
         ~IChannelMessageObservable() {}
     };
 }

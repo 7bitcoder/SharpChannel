@@ -12,7 +12,7 @@ namespace cm
     class WriteOnlyChannel : public IWriteOnlyChannel
     {
     public:
-        using Ptr = std::unique_ptr<WriteOnlyChannel>;
+        using Ptr = std::shared_ptr<WriteOnlyChannel>;
 
         bool next(const std::string &msg) final;
         bool next(const std::vector<char> &data) final;

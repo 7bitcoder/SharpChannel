@@ -5,133 +5,166 @@
 namespace cm
 {
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived)
     {
-        return _callbacksMap->insert(onMessageReceived, OnCompleted(), OnError(), OnConnected());
+        return makeCallback(onMessageReceived);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived)
     {
-        return _callbacksMap->insert(onDataReceived, OnCompleted(), OnError(), OnConnected());
+        return makeCallback(onDataReceived);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnCompleted &onCompleted)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnCompleted &onCompleted)
     {
-        return _callbacksMap->insert(OnMessageReceived(), onCompleted, OnError(), OnConnected());
+        return makeCallback(OnMessageReceived(), onCompleted);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnError &onError)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnError &onError)
     {
-        return _callbacksMap->insert(OnMessageReceived(), OnCompleted(), onError, OnConnected());
+        return makeCallback(OnMessageReceived(), OnCompleted(), onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap->insert(OnMessageReceived(), onCompleted, onError, OnConnected());
+        return makeCallback(OnMessageReceived(), onCompleted, onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap->insert(onMessageReceived, onCompleted, onError, OnConnected());
+        return makeCallback(onMessageReceived, onCompleted, onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return _callbacksMap->insert(onDataReceived, onCompleted, onError, OnConnected());
+        return makeCallback(onDataReceived, onCompleted, onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IMessageObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IMessageObserver &observer)
     {
         OnMessageReceived onMessageReceived = std::bind(&IMessageObserver::next, &observer, std::placeholders::_1);
-        return _callbacksMap->insert(onMessageReceived, OnCompleted(), OnError(), OnConnected());
+        return subscribe(onMessageReceived);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IDataObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IDataObserver &observer)
     {
         OnDataReceived onDataReceived = std::bind(&IDataObserver::next, &observer, std::placeholders::_1);
-        return _callbacksMap->insert(onDataReceived, OnCompleted(), OnError(), OnConnected());
+        return subscribe(onDataReceived);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IErrorObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IErrorObserver &observer)
     {
         OnError onError = std::bind(&IErrorObserver::error, &observer, std::placeholders::_1);
-        return _callbacksMap->insert(OnDataReceived(), OnCompleted(), onError, OnConnected());
+        return subscribe(onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(ICompleteObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(ICompleteObserver &observer)
     {
         OnCompleted onCompleted = std::bind(&ICompleteObserver::complete, &observer);
-        return _callbacksMap->insert(OnDataReceived(), onCompleted, OnError(), OnConnected());
+        return subscribe(onCompleted);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IChannelDataObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IChannelDataObserver &observer)
     {
         OnDataReceived onMessageReceived = std::bind(&IDataObserver::next, &observer, std::placeholders::_1);
         OnCompleted onCompleted = std::bind(&ICompleteObserver::complete, &observer);
         OnError onError = std::bind(&IErrorObserver::error, &observer, std::placeholders::_1);
-        return _callbacksMap->insert(onMessageReceived, onCompleted, onError, OnConnected());
+        return subscribe(onMessageReceived, onCompleted, onError);
     }
 
-    std::unique_ptr<IUnsubscribable> ReadOnlyChannel::subscribe(IChannelMessageObserver &observer)
+    IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IChannelMessageObserver &observer)
     {
         OnMessageReceived onMessageReceived = std::bind(&IMessageObserver::next, &observer, std::placeholders::_1);
         OnCompleted onCompleted = std::bind(&ICompleteObserver::complete, &observer);
         OnError onError = std::bind(&IErrorObserver::error, &observer, std::placeholders::_1);
-        return _callbacksMap->insert(onMessageReceived, onCompleted, onError, OnConnected());
+        return subscribe(onMessageReceived, onCompleted, onError);
     }
 
-    void ReadOnlyChannel::nextAll(const std::string &msg)
+    IUnsubscribable::Ptr ReadOnlyChannel::makeCallback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
+    {
+        return registerCallback(Callback(onMessageReceived, onCompleted, onError));
+    }
+
+    IUnsubscribable::Ptr ReadOnlyChannel::makeCallback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
+    {
+        return registerCallback(Callback(onDataReceived, onCompleted, onError));
+    }
+
+    IUnsubscribable::Ptr ReadOnlyChannel::registerCallback(Callback &callback)
+    {
+        auto callBackId = _callbacksHandler->addCallback(callback);
+        if (callBackId)
+        {
+            auto unsubscriber = [weakHandler = std::weak_ptr<CallbacksHandler>(_callbacksHandler), callBackId]()
+            {
+                auto weakHandlerShared = weakHandler.lock();
+                if (weakHandlerShared)
+                {
+                    return weakHandlerShared->removeCallback(callBackId);
+                }
+                else
+                {
+                    // TODO throw exception;
+                    return false;
+                }
+            };
+            return std::make_unique<Unsubscriber>(unsubscriber);
+        }
+        return nullptr;
+    }
+
+    void ReadOnlyChannel::nextAll(const std::string &msg) const
     {
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, msg]()
-                                         { _callbacksMap->nextAll(msg); });
+                                         { _callbacksHandler->nextAll(msg); });
         }
         else
         {
-            return _callbacksMap->nextAll(msg);
+            return _callbacksHandler->nextAll(msg);
         }
     }
 
-    void ReadOnlyChannel::nextAll(const std::vector<char> &data)
+    void ReadOnlyChannel::nextAll(const std::vector<char> &data) const
     {
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, data]()
-                                         { _callbacksMap->nextAll(data); });
+                                         { _callbacksHandler->nextAll(data); });
         }
         else
         {
-            return _callbacksMap->nextAll(data);
+            return _callbacksHandler->nextAll(data);
         }
     }
 
-    void ReadOnlyChannel::completeAll()
+    void ReadOnlyChannel::completeAll() const
     {
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this]()
-                                         { _callbacksMap->completeAll(); });
+                                         { _callbacksHandler->completeAll(); });
 
             // send empty to inform that is finished
             _eventLoop->postChannelEvent(std::function<void(void)>());
         }
         else
         {
-            return _callbacksMap->completeAll();
+            return _callbacksHandler->completeAll();
         }
     }
 
-    void ReadOnlyChannel::errorAll(const std::exception &error)
+    void ReadOnlyChannel::errorAll(const std::exception &error) const
     {
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, error]()
-                                         { _callbacksMap->errorAll(error); });
+                                         { _callbacksHandler->errorAll(error); });
         }
         else
         {
-            return _callbacksMap->errorAll(error);
+            return _callbacksHandler->errorAll(error);
         }
     }
 

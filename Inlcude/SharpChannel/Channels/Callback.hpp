@@ -5,33 +5,31 @@
 
 namespace cm
 {
-    using OnConnected = std::function<void()>;
-    
     class Callback
     {
     public:
         // getInfo
-        bool isData() { return bool(_onDataReceived); }
-        bool isMessage() { return bool(_onMessageReceived); }
-        bool isComplete() { return bool(_onCompleted); }
+        bool isData() const { return bool(_onDataReceived); }
+        bool isMessage() const { return bool(_onMessageReceived); }
+        bool isComplete() const { return bool(_onCompleted); }
         // callable
-        void onMessageReceived(const std::string &msg);
-        void onDataReceived(const std::vector<char> &data);
-        void onComplete();
-        void onConnected();
-        void onError(const std::exception& error); 
+        void onMessageReceived(const std::string &msg) const;
+        void onDataReceived(const std::vector<char> &data) const;
+        void onComplete() const;
+        void onError(const std::exception& error) const; 
 
         // initialization
-        Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected);
+        Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
 
-        Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected);
+        Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
+
+        Callback( Callback && ) = default;
 
         ~Callback() {}
     private:
-        OnMessageReceived _onMessageReceived;
-        OnDataReceived _onDataReceived;
-        OnError _onError;
-        OnCompleted _onCompleted;
-        OnConnected _onConnected;
+        const OnMessageReceived _onMessageReceived;
+        const OnDataReceived _onDataReceived;
+        const OnError _onError;
+        const OnCompleted _onCompleted;
     };
 }

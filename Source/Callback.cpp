@@ -3,7 +3,7 @@
 
 namespace cm
 {
-    void Callback::onMessageReceived(const std::string &msg)
+    void Callback::onMessageReceived(const std::string &msg) const
     {
         if (_onMessageReceived)
         {
@@ -11,7 +11,7 @@ namespace cm
         };
     }
 
-    void Callback::onDataReceived(const std::vector<char> &data)
+    void Callback::onDataReceived(const std::vector<char> &data) const
     {
         if (_onDataReceived)
         {
@@ -19,7 +19,7 @@ namespace cm
         }
     }
 
-    void Callback::onComplete()
+    void Callback::onComplete() const
     {
         if (_onCompleted)
         {
@@ -27,23 +27,17 @@ namespace cm
         }
     }
 
-    void Callback::onConnected()
+    void Callback::onError(const std::exception &error) const
     {
-        if (_onConnected)
+        if (_onError)
         {
-            _onConnected();
-        }
-    }
-
-    void Callback::onError(const std::exception& error) {
-        if(_onError) {
             _onError(error);
         }
     }
 
-    Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
-        : _onMessageReceived(onMessageReceived), _onCompleted(onCompleted), _onError(onError), _onConnected(onConnected) {}
+    Callback::Callback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
+        : _onMessageReceived(onMessageReceived), _onCompleted(onCompleted), _onError(onError) {}
 
-    Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError, const OnConnected &onConnected)
-        : _onDataReceived(onDataReceived), _onCompleted(onCompleted), _onError(onError), _onConnected(onConnected) {}
+    Callback::Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
+        : _onDataReceived(onDataReceived), _onCompleted(onCompleted), _onError(onError) {}
 }

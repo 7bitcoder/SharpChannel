@@ -2,6 +2,7 @@
 #include <memory>
 #include <functional>
 #include "IUnsubscribable.hpp"
+#include "Observers/IErrorObserver.hpp"
 
 namespace cm
 {
@@ -9,7 +10,10 @@ namespace cm
 
     struct IErrorObservable
     {
-        virtual std::unique_ptr<IUnsubscribable> subscribe(const OnError &onError) = 0;
+        using Ptr = std::shared_ptr<IErrorObservable>;
+
+        virtual IUnsubscribable::Ptr subscribe(const OnError &onError) = 0;
+        virtual IUnsubscribable::Ptr subscribe(IErrorObserver &observer) = 0;
 
         virtual ~IErrorObservable() {}
     };

@@ -6,7 +6,7 @@ set(SRC
     ReadOnlyChannel.cpp
     ChannelObserver.cpp
     Callback.cpp
-    CallbacksMap.cpp
+    CallbacksHandler.cpp
     Unsubscriber.cpp
 )
 

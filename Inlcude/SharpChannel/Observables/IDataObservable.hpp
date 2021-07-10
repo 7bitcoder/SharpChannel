@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include "IUnsubscribable.hpp"
+#include "Observers/IDataObserver.hpp"
 
 namespace cm
 {
@@ -10,7 +11,10 @@ namespace cm
 
     struct IDataObservable
     {
-        virtual std::unique_ptr<IUnsubscribable> subscribe(const OnDataReceived &onDataReceived) = 0;
+        using Ptr = std::shared_ptr<IDataObservable>;
+
+        virtual IUnsubscribable::Ptr subscribe(const OnDataReceived &onDataReceived) = 0;
+        virtual IUnsubscribable::Ptr subscribe(IDataObserver &observer) = 0;
 
         virtual ~IDataObservable() {}
     };
