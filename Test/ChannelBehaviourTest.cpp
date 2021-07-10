@@ -72,6 +72,20 @@ TEST(ChannelBehaviour, Unsubscription)
     EXPECT_FALSE(sw);
 }
 
+TEST(ChannelBehaviour, UnsubscriptionSuccesful)
+{
+    cm::RunCommandSettings settings;
+    settings.command = " ";
+    auto comunicator = cm::CommandChannel::create(settings);
+
+    auto onMessageReceived = [](const std::string &msg)
+    {
+    };
+
+    auto ubsubscriber = comunicator->subscribe(onMessageReceived);
+    EXPECT_TRUE(ubsubscriber->unsubscribe());
+}
+
 TEST(ChannelBehaviour, MultipleUnsubscription)
 {
     cm::RunCommandSettings settings;
@@ -121,7 +135,7 @@ TEST(ChannelBehaviour, OneOfManyUnsubscription)
     };
 
     auto ubsubscriber1 = comunicator->subscribe(onMessageReceived);
-    
+
     bool sw2 = false;
     auto onMessageReceived2 = [&sw2](const std::string &msg)
     {
@@ -144,6 +158,26 @@ TEST(ChannelBehaviour, OneOfManyUnsubscription)
     EXPECT_TRUE(sw1);
     EXPECT_FALSE(sw2);
     EXPECT_TRUE(sw3);
+}
+
+TEST(ChannelBehaviour, UnsubscriptionOnDeletedObject)
+{
+    cm::IUnsubscribable::Ptr unsubscriber;
+    {
+        cm::RunCommandSettings settings;
+        settings.command = " ";
+        auto comunicator = cm::CommandChannel::create(settings);
+
+        bool sw = false;
+        auto onMessageReceived = [&sw](const std::string &msg)
+        {
+            sw = true;
+        };
+
+        unsubscriber = comunicator->subscribe(onMessageReceived);
+    }
+
+    EXPECT_FALSE(unsubscriber->unsubscribe());
 }
 
 TEST(ChannelBehaviour, Error)

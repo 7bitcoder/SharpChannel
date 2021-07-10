@@ -5,19 +5,11 @@
 
 namespace cm
 {
-    class CommandChannel final : public ReadOnlyChannel, public IRunnable
+    class CommandChannel : public ReadOnlyChannel, public IRunnable
     {
     public:
         using Ptr = std::shared_ptr<CommandChannel>;
 
         static Ptr create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
-        CommandChannel(const RunCommandSettings &settings) : _settings(std::move(settings)) {}
-        ~CommandChannel() {}
-
-        void run() final;
-        void finish() final;
-
-    private:
-        RunCommandSettings _settings;
     };
 }

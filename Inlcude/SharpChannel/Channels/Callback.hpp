@@ -24,8 +24,6 @@ namespace cm
         Callback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
 
         Callback( Callback && ) = default;
-
-        ~Callback() {}
     private:
         const OnMessageReceived _onMessageReceived;
         const OnDataReceived _onDataReceived;

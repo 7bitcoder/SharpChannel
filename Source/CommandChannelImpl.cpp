@@ -1,5 +1,5 @@
 #include <string>
-#include "CommandChannel.hpp"
+#include "CommandChannelImpl.hpp"
 #include "ChannelException.hpp"
 
 namespace cm
@@ -7,12 +7,12 @@ namespace cm
 
     CommandChannel::Ptr CommandChannel::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<CommandChannel>(settings);
+        auto comunicator = std::make_unique<CommandChannelImpl>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    void CommandChannel::run()
+    void CommandChannelImpl::run()
     {
         std::string result;
         try {
@@ -30,7 +30,7 @@ namespace cm
         completeAll();
     }
 
-    void CommandChannel::finish()
+    void CommandChannelImpl::finish()
     {
     }
 }

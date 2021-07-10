@@ -21,7 +21,7 @@ add_executable(Test
     ChannelBehaviourTest.cpp
     CommandOutputChannel.cpp
     #SocketServerTest.cpp
-    #SocketClientTest.cpp
+    SocketClientChannelTest.cpp
 )
 
 target_link_libraries(Test 

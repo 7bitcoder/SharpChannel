@@ -1,7 +1,8 @@
 #include <memory>
 #include <vector>
-#include "SocketClientWin.hpp"
-#include "Settings.hpp"#include <windows.h>
+#include "SocketClientChannelImpl.hpp"
+#include "Settings.hpp"
+#include <windows.h>
 
 
 
@@ -13,19 +14,19 @@
 namespace cm
 {
 
-    std::unique_ptr<SocketClient> SocketClient::getObject(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
+    SocketClientChannel::Ptr SocketClientChannel::create(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<SocketClientWin>(settings);
+        auto comunicator = std::make_unique<SocketClientChannelImpl>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    SocketClientWin::~SocketClientWin()
+    SocketClientChannelImpl::~SocketClientChannelImpl()
     {
         delete[] recvbuf;
     }
 
-    void SocketClientWin::init() {
+    void SocketClientChannelImpl::init() {
         iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (iResult != 0)
         {
@@ -84,7 +85,7 @@ namespace cm
         }
     }
 
-    void SocketClientWin::run()
+    void SocketClientChannelImpl::run()
     {
         try {
             guard.lock();
@@ -99,7 +100,6 @@ namespace cm
             }
             
             guard.unlock();
-            connectedAll();
             // Receive until the peer shuts down the connection
             do
             {
@@ -147,17 +147,17 @@ namespace cm
         recvbuf = nullptr;
     }
 
-    bool SocketClientWin::sendDataImpl(const std::vector<char> &data)
+    bool SocketClientChannelImpl::sendDataImpl(const std::vector<char> &data)
     {
         return sendRawData(data.data(), data.size());
     }
 
-    bool SocketClientWin::sendMessageImpl(const std::string &msg)
+    bool SocketClientChannelImpl::sendMessageImpl(const std::string &msg)
     {
         return sendRawData(msg.c_str(), msg.length());
     }
 
-    bool SocketClientWin::sendRawData(const char *data, const size_t lenght)
+    bool SocketClientChannelImpl::sendRawData(const char *data, const size_t lenght)
     {
         const char *data_ptr = (const char*) data;
         long int bytes_sent = 0;

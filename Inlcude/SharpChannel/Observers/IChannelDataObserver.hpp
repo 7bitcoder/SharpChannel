@@ -8,6 +8,5 @@ namespace cm
 
     struct IChannelDataObserver : public ICompleteObserver, public IErrorObserver, public IDataObserver
     {
-        ~IChannelDataObserver() {}
     };
 }

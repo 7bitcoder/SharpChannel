@@ -41,8 +41,5 @@ namespace cm
             mlock.unlock();     // unlock before notificiation to minimize mutex con
             _cond.notify_one(); // notify one waiting thread
         }
-
-        ChannelEventLoop(){};
-        ~ChannelEventLoop(){};
     };
 }

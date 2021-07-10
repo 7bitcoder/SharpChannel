@@ -3,7 +3,7 @@
 #include <atomic>
 #include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "SocketClient.hpp"
+#include "SocketClientChannel.hpp"
 #include "SharpChannel.hpp"
 
 #define WIN32_LEAN_AND_MEAN
@@ -18,27 +18,28 @@
 
 namespace cm
 {
-    class SocketClientWin final : public SocketClient
+    class SocketClientChannelImpl final : public SocketClientChannel
     {
     public:
-        SocketClientWin(const SocketClientSettings &settings)
+        SocketClientChannelImpl(const SocketClientSettings &settings)
         {
             _settings = settings;
             end = false;
         }
-        ~SocketClientWin();
-        void run() override;
+        ~SocketClientChannelImpl();
+        void run() final;
 
-        bool sendMessageImpl(const std::string &msg) override;
-        bool sendDataImpl(const std::vector<char> &data) override;
+        bool sendMessageImpl(const std::string &msg) final;
+        bool sendDataImpl(const std::vector<char> &data) final;
 
-        void finish() override
+        void finish() final
         {
             end = true;
             closesocket(ConnectSocket);
             WSACleanup();
         }
-
+        void error(const std::exception&) final {}
+        void complete() final {}
     private:
         void init();
         bool sendRawData(const char *data, const size_t lenght);

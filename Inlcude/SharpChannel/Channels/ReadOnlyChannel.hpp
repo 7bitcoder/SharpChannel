@@ -33,7 +33,6 @@ namespace cm
         IUnsubscribable::Ptr subscribe(IChannelMessageObserver &observer) final;
 
         void setChannelEventLoop(IChannelEventLoop *eventLoop);
-        ~ReadOnlyChannel() {}
 
     protected:
         void completeAll() const;

@@ -8,7 +8,5 @@ namespace cm
     struct IChannelDataObservable : public ICompleteObservable, public IErrorObservable, public IDataObservable
     {
         using Ptr = std::shared_ptr<IChannelDataObservable>;
-
-        ~IChannelDataObservable() {}
     };
 }

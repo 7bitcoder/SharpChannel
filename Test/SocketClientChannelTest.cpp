@@ -2,7 +2,7 @@
 #include <thread>
 #include <gtest/gtest.h>
 #include "SharpChannel.hpp"
-#include "ChannelEventLoop.hpp"
+#include "SocketClientChannel.hpp"
 #include "Config.hpp"
 
 namespace
@@ -28,54 +28,49 @@ namespace
             std::system(cmd.c_str());
         });
     }
-    class Example : public cm::IMessageObserver
+    class Example : public cm::IChannelMessageObserver
     {
     private:
         bool completed = false;
-        bool error = false;
+        bool err = false;
         bool connected = false;
         bool sended = false;
         int received = 0;
 
     public:
-        std::shared_ptr<cm::IChannel> comunicator;
+        cm::FullDuplexChannel::Ptr comunicator;
         bool wasCompleted() { return completed; }
-        bool wasError() { return error; }
+        bool wasError() { return err; }
         bool wasMessage() { return received > 0; }
         bool wasConnected() { return connected; }
         bool wasSended() { return sended; }
         int messages() { return received; }
 
-        void onCompleted() override
+        void complete() override
         {
             completed = true;
         }
 
-        void onError(const std::exception &e) override
+        void error(const std::exception &e) override
         {
-            error = true;
+            err = true;
         }
 
-        void onMessageReceived(const std::string &msg) override
+        bool next(const std::string &msg) override
         {
             received++;
-        }
-
-        void onConnected()
-        {
-            connected = true;
-            sended = comunicator->sendMessage("Hello, world");
+            return true;
         }
 
         virtual ~Example() {}
     };
 }
 
-TEST(SocketClient, Subscription)
+TEST(SocketClientChannelTest, Subscription)
 {
     cm::SocketClientSettings settings;
     settings.port = 64123;
-    auto comunicator = cm::SharpChannel::makeSocketClient(settings);
+    auto comunicator = cm::SocketClientChannel::create(settings);
 
     auto th = runPythonClient(TestScenario::SimplePong, settings.port);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -93,7 +88,7 @@ TEST(SocketClient, Subscription)
 
     auto onConnected = [&connected, &sended, &comunicator]() {
         connected = true;
-        sended = comunicator->sendMessage("Hello, world");
+        sended = comunicator->next("Hello, world");
     };
 
     comunicator->subscribe(onMessageReceived, onConnected, onComplete);
@@ -117,11 +112,11 @@ TEST(SocketClient, Subscription)
     EXPECT_TRUE(sended);
 }
 
-/*TEST(SocketClient, Unsubscription)
+/*TEST(SocketClientChannelTest, Unsubscription)
 {
     cm::SocketClientSettings settings;
     settings.port = 64124;
-    auto comunicator = cm::SharpChannel::makeSocketClient(settings);
+    auto comunicator = cm::SocketClientChannel::create(settings);
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
     bool gotMessage = false, completed = false, connected = false, sended = false;
@@ -157,11 +152,11 @@ TEST(SocketClient, Subscription)
     EXPECT_FALSE(sended);
 }
 
-TEST(SocketClient, NormalFinish)
+TEST(SocketClientChannelTest, NormalFinish)
 {
     cm::SocketClientSettings settings;
     settings.port = 64125;
-    auto comunicator = cm::SharpChannel::makeSocketClient(settings);
+    auto comunicator = cm::SocketClientChannel::create(settings);
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
     bool gotMessage = false, completed = false, connected = false, sended = false;
@@ -181,12 +176,12 @@ TEST(SocketClient, NormalFinish)
     th.join();
 }*/
 
-TEST(SocketClient, Error)
+TEST(SocketClientChannelTest, Error)
 {
     cm::SocketClientSettings settings;
     settings.port = 64126;
 
-    auto comunicator = cm::SharpChannel::makeSocketClient(settings);
+    auto comunicator = cm::SocketClientChannel::create(settings);
 
     bool gotMessage = false, completed = false, connected = false, sended = false, gotError = false;
 
@@ -220,12 +215,12 @@ TEST(SocketClient, Error)
     EXPECT_FALSE(sended);
 }
 
-TEST(SocketClient, Parralel)
+TEST(SocketClientChannelTest, Parralel)
 {
     cm::ChannelEventLoop loop;
     cm::SocketClientSettings settings;
     settings.port = 64127;
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings, &loop);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings, &loop);
 
     bool gotMessage = false, completed = false, connected = false, sended = false, gotError = false;
 
@@ -262,12 +257,12 @@ TEST(SocketClient, Parralel)
     EXPECT_TRUE(sended);
 }
 
-/*TEST(SocketClient, ParralelFullDuplex)
+/*TEST(SocketClientChannelTest, ParralelFullDuplex)
 {
     cm::ChannelEventLoop loop;
     cm::SocketClientSettings settings;
     settings.port = 64135;
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings, &loop);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings, &loop);
     bool gotMessage = false, completed = false, connected = false, sended = false, gotError = false;
 
     auto th = runPythonClient(TestScenario::SimplePong, settings.port);
@@ -304,12 +299,12 @@ TEST(SocketClient, Parralel)
     EXPECT_EQ(loops, 3);
 }*/
 
-TEST(SocketClient, SubscriptionClass)
+TEST(SocketClientChannelTest, SubscriptionClass)
 {
     cm::SocketClientSettings settings;
     settings.port = 64128;
 
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings);
 
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
@@ -331,11 +326,11 @@ TEST(SocketClient, SubscriptionClass)
     EXPECT_FALSE(ex.wasError());
 }
 
-/*TEST(SocketClient, UnsubscriptionClass)
+/*TEST(SocketClientChannelTest, UnsubscriptionClass)
 {
     cm::SocketClientSettings settings;
     settings.port = 64129;
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings);
 
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
@@ -359,11 +354,11 @@ TEST(SocketClient, SubscriptionClass)
     EXPECT_FALSE(ex.wasMessage());
 }*/
 
-TEST(SocketClient, ErrorClass)
+TEST(SocketClientChannelTest, ErrorClass)
 {
     cm::SocketClientSettings settings;
     settings.port = 64130;
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings);
 
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 
@@ -399,12 +394,12 @@ TEST(SocketClient, ErrorClass)
     EXPECT_EQ(ex.messages(), 1);
 }
 
-TEST(SocketClient, ParralelClass)
+TEST(SocketClientChannelTest, ParralelClass)
 {
     cm::ChannelEventLoop loop;
     cm::SocketClientSettings settings;
     settings.port = 64131;
-    std::shared_ptr<cm::IChannel> comunicator = cm::SharpChannel::makeSocketClient(settings, &loop);
+    std::shared_ptr<cm::IChannel> comunicator = cm::SocketClientChannel::create(settings, &loop);
 
     auto th = runPythonClient(TestScenario::MessageReceive, settings.port);
 

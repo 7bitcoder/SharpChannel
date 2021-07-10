@@ -7,8 +7,7 @@ set(SRC
     Callback.cpp
     CallbacksHandler.cpp
     Unsubscriber.cpp
-    CommandChannel.cpp
-    CommandOutputChannel.cpp
+    CommandChannelImpl.cpp
 )
 
 if(OS_WINDOWS)
@@ -18,9 +17,10 @@ if(OS_WINDOWS)
     )
 
     set(PLATFORM_SRC
+        Windows/CommandOutputChannelImpl.cpp
         #Windows/SocketServerWin.cpp
-        #Windows/SocketClientWin.cpp
-       # Windows/StdComunicatorWin.cpp
+        Windows/SocketClientChannelImpl.cpp
+        #Windows/StdComunicatorWin.cpp
     )
 
 elseif(OS_LINUX OR OS_FREEBSD OR OS_OPENBSD OR OS_NETBSD)
@@ -38,7 +38,6 @@ endif()
 add_library(SharpChannel
     ${SRC} 
     ${PLATFORM_SRC}
-    SharpChannel.cpp
 )
 
 target_include_directories(SharpChannel PRIVATE

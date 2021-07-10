@@ -17,7 +17,5 @@ namespace cm
 
         virtual IUnsubscribable::Ptr subscribe(IChannelDataObserver &observer) = 0;
         virtual IUnsubscribable::Ptr subscribe(IChannelMessageObserver &observer) = 0;
-
-        virtual ~IReadOnlyChannel() {}
     };
 }

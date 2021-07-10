@@ -11,9 +11,8 @@ namespace cm
         using Ptr = std::shared_ptr<Unsubscriber>;
 
         Unsubscriber(const std::function<bool()> &unsubscriber);
+        
         bool unsubscribe();
-
-        ~Unsubscriber() {}
     private:
         const std::function<bool()> _unsubscriber;
     };

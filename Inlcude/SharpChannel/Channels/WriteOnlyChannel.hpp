@@ -17,8 +17,6 @@ namespace cm
         bool next(const std::string &msg) final;
         bool next(const std::vector<char> &data) final;
 
-        ~WriteOnlyChannel() {}
-
     protected:
         virtual bool sendMessageImpl(const std::string &msg) = 0;
         virtual bool sendDataImpl(const std::vector<char> &data) = 0;
