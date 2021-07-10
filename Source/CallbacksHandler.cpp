@@ -5,7 +5,7 @@ namespace cm
     CallbacksHandler::CallbackId CallbacksHandler::addCallback(Callback &callback)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        const CallbackId index = currentIndex++;
+        const CallbackId index = ++currentIndex;
         auto inserted = _callbacksMap.emplace(index, std::move(callback));
         return inserted.second ? index : 0;
     }

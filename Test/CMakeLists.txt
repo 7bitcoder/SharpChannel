@@ -1,8 +1,10 @@
 
+set(PythonDir ${CMAKE_CURRENT_SOURCE_DIR}/python)
 
 set(CopyFiles 
-    ${CMAKE_CURRENT_SOURCE_DIR}/socketServerTester.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/socketClientTester.py
+    ${PythonDir}/socketServerTester.py
+    ${PythonDir}/socketClientTester.py
+    ${PythonDir}/echo.py
 )
 
 file(COPY ${CopyFiles}
@@ -16,7 +18,8 @@ file(COPY ${CopyFiles}
 add_executable(Test 
     RunTests.cpp
     CommandChannelTest.cpp
-    #ChannelBehaviourTest.cpp
+    ChannelBehaviourTest.cpp
+    CommandOutputChannel.cpp
     #SocketServerTest.cpp
     #SocketClientTest.cpp
 )

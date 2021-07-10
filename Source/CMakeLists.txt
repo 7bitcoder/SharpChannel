@@ -2,12 +2,13 @@
 
 set(SRC 
     NamedPipe.cpp
-    CommandChannel.cpp
     ReadOnlyChannel.cpp
     WriteOnlyChannel.cpp
     Callback.cpp
     CallbacksHandler.cpp
     Unsubscriber.cpp
+    CommandChannel.cpp
+    CommandOutputChannel.cpp
 )
 
 if(OS_WINDOWS)
