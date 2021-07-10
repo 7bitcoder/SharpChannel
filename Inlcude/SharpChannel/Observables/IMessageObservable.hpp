@@ -2,6 +2,7 @@
 #include <memory>
 #include <functional>
 #include "IUnsubscribable.hpp"
+#include "Observers/IMessageObserver.hpp"
 
 namespace cm
 {
@@ -9,7 +10,10 @@ namespace cm
 
     struct IMessageObservable
     {
-        virtual std::unique_ptr<IUnsubscribable> subscribe(const OnMessageReceived &onMessageReceived) = 0;
+        using Ptr = std::shared_ptr<IMessageObservable>;
+
+        virtual IUnsubscribable::Ptr subscribe(const OnMessageReceived &onMessageReceived) = 0;
+        virtual IUnsubscribable::Ptr subscribe(IMessageObserver &observer) = 0;
 
         virtual ~IMessageObservable() {}
     };
