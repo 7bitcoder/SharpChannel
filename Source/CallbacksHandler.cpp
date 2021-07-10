@@ -6,20 +6,20 @@ namespace cm
     {
         const std::lock_guard<std::mutex> lock(_guard);
         const CallbackId index = currentIndex++;
-        auto inserted = _map.emplace(index, std::move(callback));
+        auto inserted = _callbacksMap.emplace(index, std::move(callback));
         return inserted.second ? index : 0;
     }
 
     bool CallbacksHandler::removeCallback(CallbackId callbackId)
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        return _map.erase(callbackId) == 1;
+        return _callbacksMap.erase(callbackId) == 1;
     }
 
     void CallbacksHandler::completeAll() const
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        for (auto &pair : _map)
+        for (auto &pair : _callbacksMap)
         {
             pair.second.onComplete();
         }
@@ -29,7 +29,7 @@ namespace cm
     {
         const std::lock_guard<std::mutex> lock(_guard);
         std::unique_ptr<std::vector<char>> ptr;
-        for (auto &pair : _map)
+        for (auto &pair : _callbacksMap)
         {
             auto &callback = pair.second;
             if (callback.isData())
@@ -51,7 +51,7 @@ namespace cm
     {
         const std::lock_guard<std::mutex> lock(_guard);
         std::unique_ptr<std::string> ptr;
-        for (auto &pair : _map)
+        for (auto &pair : _callbacksMap)
         {
             auto &callback = pair.second;
             if (callback.isData())
@@ -72,7 +72,7 @@ namespace cm
     void CallbacksHandler::errorAll(const std::exception &error) const
     {
         const std::lock_guard<std::mutex> lock(_guard);
-        for (auto &pair : _map)
+        for (auto &pair : _callbacksMap)
         {
             pair.second.onError(error);
         }

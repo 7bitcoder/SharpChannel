@@ -1,5 +1,4 @@
 #include "SharpChannel.hpp"
-#include "RunCommand.hpp"
 #include "SocketServer.hpp"
 #include "SocketClient.hpp"
 namespace cm
@@ -11,10 +10,10 @@ namespace cm
     //    return nullptr; //return StdComunicator::getObject(settings, eventLoop);
     //}
 //
-    RunCommand::Ptr SharpChannel::makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
-    {
-        return RunCommand::create(settings, eventLoop);
-    }
+   //CommandChannel::Ptr SharpChannel::makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+   //{
+   //    return CommandChannel::create(settings, eventLoop);
+   //}
     //    
     //std::unique_ptr<IChannel> SharpChannel::makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop)
     //{

@@ -15,7 +15,7 @@ file(COPY ${CopyFiles}
 
 add_executable(Test 
     RunTests.cpp
-    #RunCommandTest.cpp
+    CommandChannelTest.cpp
     #ChannelBehaviourTest.cpp
     #SocketServerTest.cpp
     #SocketClientTest.cpp

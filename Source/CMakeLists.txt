@@ -2,9 +2,9 @@
 
 set(SRC 
     NamedPipe.cpp
-    RunCommand.cpp
+    CommandChannel.cpp
     ReadOnlyChannel.cpp
-    ChannelObserver.cpp
+    WriteOnlyChannel.cpp
     Callback.cpp
     CallbacksHandler.cpp
     Unsubscriber.cpp

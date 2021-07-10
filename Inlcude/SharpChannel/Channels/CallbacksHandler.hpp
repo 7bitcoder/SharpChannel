@@ -27,6 +27,6 @@ namespace cm
     private:
         size_t currentIndex = 0;
         mutable std::mutex _guard;
-        std::map<size_t, const Callback> _map;
+        std::map<size_t, const Callback> _callbacksMap;
     };
 }

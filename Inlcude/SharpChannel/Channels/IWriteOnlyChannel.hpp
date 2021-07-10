@@ -7,6 +7,6 @@ namespace cm
     {
         using Ptr = std::shared_ptr<IWriteOnlyChannel>;
 
-        ~IChannelObserver() {}
+        ~IWriteOnlyChannel() {}
     };
 }

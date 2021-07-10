@@ -1,18 +1,18 @@
 #include <string>
-#include "RunCommand.hpp"
+#include "CommandChannel.hpp"
 #include "ChannelException.hpp"
 
 namespace cm
 {
 
-    RunCommand::Ptr RunCommand::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    CommandChannel::Ptr CommandChannel::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<RunCommand>(settings);
+        auto comunicator = std::make_unique<CommandChannel>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    void RunCommand::run()
+    void CommandChannel::run()
     {
         std::string result;
         try {
@@ -30,7 +30,7 @@ namespace cm
         completeAll();
     }
 
-    void RunCommand::finish()
+    void CommandChannel::finish()
     {
     }
 }

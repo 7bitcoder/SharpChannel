@@ -1,8 +1,7 @@
 #pragma once
 #include <iostream>
 #include <memory>
-
-#include "RunCommand.hpp"
+#include "CommandChannel.hpp"
 
 namespace cm
 {
@@ -11,7 +10,7 @@ namespace cm
     public:
         //static std::unique_ptr<IChannelDataObserver> makeStdIO(const StdComunicatorSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
-        static RunCommand::Ptr makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
+        // static CommandChannel::Ptr makeSystemCommand(const RunCommandSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 
         //static std::unique_ptr<IChannelDataObserver> makeSocketServer(const SocketServerSettings &settings, IChannelEventLoop *eventLoop = nullptr);
 

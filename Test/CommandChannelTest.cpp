@@ -1,13 +1,13 @@
 #include <iostream>
 #include <thread>
 #include <gtest/gtest.h>
-#include "SharpChannel.hpp"
+#include "CommandChannel.hpp"
 
-TEST(RunCommand, Normal)
+TEST(CommandChannelTest, Normal)
 {
     cm::RunCommandSettings settings;
     settings.command = " ";
-    auto comunicator = cm::SharpChannel::makeSystemCommand(settings);
+    auto comunicator = cm::CommandChannel::create(settings);
 
     auto onMessageReceived = [](const std::string &msg) {
         EXPECT_TRUE(!msg.empty());
