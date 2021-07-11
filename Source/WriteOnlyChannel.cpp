@@ -1,4 +1,4 @@
-#include "Channels/WriteOnlyChannel.hpp"
+#include "WriteOnlyChannel.hpp"
 
 namespace cm
 {

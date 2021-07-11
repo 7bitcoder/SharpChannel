@@ -1,6 +1,7 @@
 #pragma once
 #include "IObservables.hpp"
 #include "IObservers.hpp"
+#include "Channels/IChannelEventLoop.hpp"
 
 namespace cm
 {
@@ -17,5 +18,7 @@ namespace cm
 
         virtual IUnsubscribable::Ptr subscribe(IChannelDataObserver &observer) = 0;
         virtual IUnsubscribable::Ptr subscribe(IChannelMessageObserver &observer) = 0;
+
+        virtual void setChannelEventLoop(IChannelEventLoop *eventLoop) = 0;
     };
 }

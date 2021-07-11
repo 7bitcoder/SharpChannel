@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <gtest/gtest.h>
-#include "CommandChannel.hpp"
+#include "SharpChannel.hpp"
 
 TEST(CommandChannelTest, Normal)
 {

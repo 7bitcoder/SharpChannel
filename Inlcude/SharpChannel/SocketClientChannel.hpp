@@ -2,7 +2,7 @@
 #include <mutex>
 #include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "Channels/FullDuplexChannel.hpp"
+#include "FullDuplexChannel.hpp"
 
 namespace cm
 {

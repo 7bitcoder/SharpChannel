@@ -1,6 +1,6 @@
 #include <utility>
 #include <functional>
-#include "Channels/ReadOnlyChannel.hpp"
+#include "ReadOnlyChannel.hpp"
 
 namespace cm
 {

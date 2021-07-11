@@ -1,18 +1,19 @@
 #include <string>
-#include "CommandChannelImpl.hpp"
+#include "CommandChannel.hpp"
+#include "CommandChannelMulti.hpp"
 #include "ChannelException.hpp"
 
 namespace cm
 {
 
-    CommandChannel::Ptr CommandChannel::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    ICommandChannel::Ptr CommandChannel::getImplementation(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<CommandChannelImpl>(settings);
+        auto comunicator = std::make_unique<CommandChannelMulti>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    void CommandChannelImpl::run()
+    void CommandChannelMulti::run()
     {
         std::string result;
         try {
@@ -30,7 +31,7 @@ namespace cm
         completeAll();
     }
 
-    void CommandChannelImpl::finish()
+    void CommandChannelMulti::finish()
     {
     }
 }

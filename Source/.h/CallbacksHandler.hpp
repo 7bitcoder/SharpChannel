@@ -4,7 +4,7 @@
 #include <mutex>
 #include <memory>
 #include <map>
-#include "Channels/Callback.hpp"
+#include "Callback.hpp"
 #include "Unsubscriber.hpp"
 
 namespace cm

@@ -3,14 +3,13 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#include "Channels/ReadOnlyChannel.hpp"
-#include "Channels/WriteOnlyChannel.hpp"
+#include "ReadOnlyChannel.hpp"
+#include "WriteOnlyChannel.hpp"
 
 namespace cm
 {
-    class FullDuplexChannel : public WriteOnlyChannel, public ReadOnlyChannel
+    struct FullDuplexChannel : public WriteOnlyChannel, public ReadOnlyChannel
     {
-    public:
         using Ptr = std::shared_ptr<FullDuplexChannel>;
     };
 }

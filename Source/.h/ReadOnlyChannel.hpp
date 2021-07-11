@@ -4,12 +4,11 @@
 #include <map>
 #include <mutex>
 #include "Channels/IReadOnlyChannel.hpp"
-#include "Channels/IChannelEventLoop.hpp"
-#include "Channels/CallbacksHandler.hpp"
+#include "CallbacksHandler.hpp"
 
 namespace cm
 {
-    class ReadOnlyChannel : public IReadOnlyChannel
+    class ReadOnlyChannel : public virtual IReadOnlyChannel
     {
     public:
         using Ptr = std::shared_ptr<ReadOnlyChannel>;
@@ -32,7 +31,7 @@ namespace cm
         IUnsubscribable::Ptr subscribe(IChannelDataObserver &observer) final;
         IUnsubscribable::Ptr subscribe(IChannelMessageObserver &observer) final;
 
-        void setChannelEventLoop(IChannelEventLoop *eventLoop);
+        void setChannelEventLoop(IChannelEventLoop *eventLoop) final;
 
     protected:
         void completeAll() const;

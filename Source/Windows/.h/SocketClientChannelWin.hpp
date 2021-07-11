@@ -18,15 +18,15 @@
 
 namespace cm
 {
-    class SocketClientChannelImpl final : public SocketClientChannel
+    class SocketClientChannelWin final : public SocketClientChannel
     {
     public:
-        SocketClientChannelImpl(const SocketClientSettings &settings)
+        SocketClientChannelWin(const SocketClientSettings &settings)
         {
             _settings = settings;
             end = false;
         }
-        ~SocketClientChannelImpl();
+        ~SocketClientChannelWin();
         void run() final;
 
         bool sendMessageImpl(const std::string &msg) final;

@@ -1,13 +1,24 @@
 
+set(INCLUDES 
+    ".h"
+)
 
 set(SRC 
-    NamedPipe.cpp
     ReadOnlyChannel.cpp
     WriteOnlyChannel.cpp
     Callback.cpp
     CallbacksHandler.cpp
     Unsubscriber.cpp
-    CommandChannelImpl.cpp
+    CommandChannel.cpp
+    CommandOutputChannel.cpp
+)
+    
+set(MULTIPLATFORM_INCLUDES
+    "Multiplatform/.h"
+)
+
+set(MULTIPLATFORM
+    Multiplatform/CommandChannelMulti.cpp
 )
 
 if(OS_WINDOWS)
@@ -17,9 +28,9 @@ if(OS_WINDOWS)
     )
 
     set(PLATFORM_SRC
-        Windows/CommandOutputChannelImpl.cpp
+        Windows/CommandOutputChannelWin.cpp
         #Windows/SocketServerWin.cpp
-        Windows/SocketClientChannelImpl.cpp
+        Windows/SocketClientChannelWin.cpp
         #Windows/StdComunicatorWin.cpp
     )
 
@@ -37,10 +48,12 @@ endif()
 
 add_library(SharpChannel
     ${SRC} 
+    ${MULTIPLATFORM}
     ${PLATFORM_SRC}
 )
 
 target_include_directories(SharpChannel PRIVATE
-    ".h"
+    ${INCLUDES}
+    ${MULTIPLATFORM_INCLUDES}
     ${PLATFORM_INCLUDES}
 )

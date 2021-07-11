@@ -1,6 +1,6 @@
 #include <memory>
 #include <vector>
-#include "SocketClientChannelImpl.hpp"
+#include "SocketClientChannelWin.hpp"
 #include "Settings.hpp"
 #include <windows.h>
 
@@ -16,17 +16,17 @@ namespace cm
 
     SocketClientChannel::Ptr SocketClientChannel::create(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<SocketClientChannelImpl>(settings);
+        auto comunicator = std::make_unique<SocketClientChannelWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    SocketClientChannelImpl::~SocketClientChannelImpl()
+    SocketClientChannelWin::~SocketClientChannelWin()
     {
         delete[] recvbuf;
     }
 
-    void SocketClientChannelImpl::init() {
+    void SocketClientChannelWin::init() {
         iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (iResult != 0)
         {
@@ -85,7 +85,7 @@ namespace cm
         }
     }
 
-    void SocketClientChannelImpl::run()
+    void SocketClientChannelWin::run()
     {
         try {
             guard.lock();
@@ -147,17 +147,17 @@ namespace cm
         recvbuf = nullptr;
     }
 
-    bool SocketClientChannelImpl::sendDataImpl(const std::vector<char> &data)
+    bool SocketClientChannelWin::sendDataImpl(const std::vector<char> &data)
     {
         return sendRawData(data.data(), data.size());
     }
 
-    bool SocketClientChannelImpl::sendMessageImpl(const std::string &msg)
+    bool SocketClientChannelWin::sendMessageImpl(const std::string &msg)
     {
         return sendRawData(msg.c_str(), msg.length());
     }
 
-    bool SocketClientChannelImpl::sendRawData(const char *data, const size_t lenght)
+    bool SocketClientChannelWin::sendRawData(const char *data, const size_t lenght)
     {
         const char *data_ptr = (const char*) data;
         long int bytes_sent = 0;

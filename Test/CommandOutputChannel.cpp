@@ -2,7 +2,7 @@
 #include <thread>
 #include <gtest/gtest.h>
 #include "Config.hpp"
-#include "CommandOutputChannel.hpp"
+#include "SharpChannel.hpp"
 
 #if defined(SYSTEM_WINDOWS)
 std::string python = "python";

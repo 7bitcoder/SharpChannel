@@ -1,5 +1,5 @@
 #include <utility>
-#include "Channels/Callback.hpp"
+#include "Callback.hpp"
 
 namespace cm
 {

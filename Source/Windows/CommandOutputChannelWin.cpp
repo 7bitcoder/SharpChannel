@@ -4,7 +4,8 @@
 #include <stdexcept>
 #include <string>
 #include <array>
-#include "CommandOutputChannelImpl.hpp"
+#include "CommandOutputChannelWin.hpp"
+#include "CommandOutputChannel.hpp"
 #include "ChannelException.hpp"
 
 namespace cm
@@ -28,14 +29,14 @@ namespace cm
         }
     }
 
-    CommandOutputChannel::Ptr CommandOutputChannel::create(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
+    ICommandOutputChannel::Ptr CommandOutputChannel::getImplementation(const RunCommandSettings &settings, IChannelEventLoop *eventLoop)
     {
-        auto comunicator = std::make_unique<CommandOutputChannelImpl>(settings);
+        auto comunicator = std::make_unique<CommandOutputChannelWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);
         return comunicator;
     }
 
-    void CommandOutputChannelImpl::run()
+    void CommandOutputChannelWin::run()
     {
         std::string result;
         try
@@ -57,7 +58,7 @@ namespace cm
         completeAll();
     }
 
-    void CommandOutputChannelImpl::finish()
+    void CommandOutputChannelWin::finish()
     {
     }
 }
