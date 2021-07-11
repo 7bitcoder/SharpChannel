@@ -5,6 +5,7 @@
 #include <mutex>
 #include "Channels/IReadOnlyChannel.hpp"
 #include "CallbacksHandler.hpp"
+#include "Callbacks.hpp"
 
 namespace cm
 {
@@ -40,11 +41,19 @@ namespace cm
         void errorAll(const std::exception &error) const;
 
     private:
+        void nextAllImpl(const std::string &msg) const;
+        void nextAllImpl(const std::vector<char> &data) const;
         IUnsubscribable::Ptr makeCallback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
         IUnsubscribable::Ptr makeCallback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted = OnCompleted(), const OnError &onError = OnError());
         IUnsubscribable::Ptr registerCallback(Callback& callback);
 
         CallbacksHandler::Ptr _callbacksHandler = std::make_shared<CallbacksHandler>();
+
+        Callbacks<void, const std::string&>::Ptr _messageCallbacks = std::make_shared<Callbacks<void, const std::string&>>();
+        Callbacks<void, const std::vector<char> &>::Ptr _dataCallbacks = std::make_shared<Callbacks<void, const std::vector<char> &>>();
+        Callbacks<void>::Ptr _completeCallbacks = std::make_shared<Callbacks<void>>();
+        Callbacks<void, const std::exception &>::Ptr _errorCallbacks = std::make_shared<Callbacks<void, const std::exception &>>();
+
         IChannelEventLoop *_eventLoop = nullptr;
     };
 }

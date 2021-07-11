@@ -10,19 +10,19 @@
 namespace cm
 {
 
-    class CallbacksHandler: public std::enable_shared_from_this<CallbacksHandler>
+    class CallbacksHandler : public std::enable_shared_from_this<CallbacksHandler>
     {
     public:
-        using Ptr = std::shared_ptr<CallbacksHandler>; 
+        using Ptr = std::shared_ptr<CallbacksHandler>;
         using CallbackId = size_t;
 
-        CallbackId addCallback(Callback& callback);
+        CallbackId addCallback(Callback &callback);
         bool removeCallback(CallbackId callbackId);
 
         void completeAll() const;
         void nextAll(const std::string &msg) const;
         void nextAll(const std::vector<char> &data) const;
-        void errorAll(const std::exception& error) const;
+        void errorAll(const std::exception &error) const;
 
     private:
         size_t currentIndex = 0;

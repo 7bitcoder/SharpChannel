@@ -113,6 +113,29 @@ namespace cm
         return nullptr;
     }
 
+    IUnsubscribable::Ptr ReadOnlyChannel::registerCallback(ICallbacks &callbacks)
+    {
+        auto callBackId = _callbacksHandler->addCallback(callback);
+        if (callBackId)
+        {
+            auto unsubscriber = [weakHandler = std::weak_ptr<CallbacksHandler>(_callbacksHandler), callBackId]()
+            {
+                auto weakHandlerShared = weakHandler.lock();
+                if (weakHandlerShared)
+                {
+                    return weakHandlerShared->removeCallback(callBackId);
+                }
+                else
+                {
+                    // TODO throw exception;
+                    return false;
+                }
+            };
+            return std::make_unique<Unsubscriber>(unsubscriber);
+        }
+        return nullptr;
+    }
+
     void ReadOnlyChannel::nextAll(const std::string &msg) const
     {
         if (_eventLoop)
@@ -144,14 +167,14 @@ namespace cm
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this]()
-                                         { _callbacksHandler->completeAll(); });
+                                         { _completeCallbacks->callAll(); });
 
             // send empty to inform that is finished
             _eventLoop->postChannelEvent(std::function<void(void)>());
         }
         else
         {
-            return _callbacksHandler->completeAll();
+            return _completeCallbacks->callAll();
         }
     }
 
@@ -160,11 +183,11 @@ namespace cm
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, error]()
-                                         { _callbacksHandler->errorAll(error); });
+                                         { _errorCallbacks->callAll(error); });
         }
         else
         {
-            return _callbacksHandler->errorAll(error);
+            return _errorCallbacks->callAll(error);
         }
     }
 
