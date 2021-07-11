@@ -1,7 +1,8 @@
 #include <memory>
 #include <vector>
 #include "SocketClientChannelWin.hpp"
-#include "Settings.hpp"
+#include "SocketClientChannel.hpp"
+#include "ChannelException.hpp"
 #include <windows.h>
 
 
@@ -14,7 +15,7 @@
 namespace cm
 {
 
-    SocketClientChannel::Ptr SocketClientChannel::create(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
+    ISocketClientChannel::Ptr SocketClientChannel::getImplementation(const SocketClientSettings &settings, IChannelEventLoop *eventLoop)
     {
         auto comunicator = std::make_unique<SocketClientChannelWin>(settings);
         comunicator->setChannelEventLoop(eventLoop);

@@ -1,10 +1,10 @@
 #pragma once
 #include <mutex>
 #include <atomic>
-#include "IRunnable.hpp"
 #include "Settings.hpp"
-#include "SocketClientChannel.hpp"
-#include "SharpChannel.hpp"
+#include "Channels/ISocketClientChannel.hpp"
+#include "ReadOnlyChannel.hpp"
+#include "WriteOnlyChannel.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -18,7 +18,7 @@
 
 namespace cm
 {
-    class SocketClientChannelWin final : public SocketClientChannel
+    class SocketClientChannelWin final : public ISocketClientChannel, public ReadOnlyChannel, public WriteOnlyChannel
     {
     public:
         SocketClientChannelWin(const SocketClientSettings &settings)
@@ -31,6 +31,8 @@ namespace cm
 
         bool sendMessageImpl(const std::string &msg) final;
         bool sendDataImpl(const std::vector<char> &data) final;
+        void error(const std::exception&) final {}
+        void complete() final {}
 
         void finish() final
         {
@@ -38,8 +40,7 @@ namespace cm
             closesocket(ConnectSocket);
             WSACleanup();
         }
-        void error(const std::exception&) final {}
-        void complete() final {}
+        
     private:
         void init();
         bool sendRawData(const char *data, const size_t lenght);

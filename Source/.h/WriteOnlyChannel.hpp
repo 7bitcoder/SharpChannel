@@ -9,7 +9,7 @@
 
 namespace cm
 {
-    class WriteOnlyChannel : public IWriteOnlyChannel
+    class WriteOnlyChannel : public virtual IWriteOnlyChannel
     {
     public:
         using Ptr = std::shared_ptr<WriteOnlyChannel>;

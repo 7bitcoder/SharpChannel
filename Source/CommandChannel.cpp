@@ -16,22 +16,22 @@ namespace cm
 
     IUnsubscribable::Ptr CommandChannel::subscribe(const OnMessageReceived &onMessageReceived)
     {
-        return IMessageObservable::Ptr(_impl)->subscribe(onMessageReceived);
+        return _impl->subscribe(onMessageReceived);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(const OnDataReceived &onDataReceived)
     {
-        return IDataObservable::Ptr(_impl)->subscribe(onDataReceived);
+        return _impl->subscribe(onDataReceived);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(const OnCompleted &onCompleted)
     {
-        return ICompleteObservable::Ptr(_impl)->subscribe(onCompleted);
+        return _impl->subscribe(onCompleted);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(const OnError &onError)
     {
-        return IErrorObservable::Ptr(_impl)->subscribe(onError);
+        return _impl->subscribe(onError);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
@@ -51,22 +51,22 @@ namespace cm
 
     IUnsubscribable::Ptr CommandChannel::subscribe(IMessageObserver &observer)
     {
-        return IMessageObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(IDataObserver &observer)
     {
-        return IDataObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(IErrorObserver &observer)
     {
-        return IErrorObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(ICompleteObserver &observer)
     {
-        return ICompleteObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandChannel::subscribe(IChannelDataObserver &observer)
@@ -88,7 +88,7 @@ namespace cm
     {
         return _impl->run();
     }
-    
+
     void CommandChannel::finish()
     {
         return _impl->finish();

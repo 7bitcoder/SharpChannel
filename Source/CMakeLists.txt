@@ -11,6 +11,7 @@ set(SRC
     Unsubscriber.cpp
     CommandChannel.cpp
     CommandOutputChannel.cpp
+    SocketClientChannel.cpp
 )
     
 set(MULTIPLATFORM_INCLUDES

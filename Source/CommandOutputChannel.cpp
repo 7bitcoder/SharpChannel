@@ -16,22 +16,22 @@ namespace cm
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(const OnMessageReceived &onMessageReceived)
     {
-        return IMessageObservable::Ptr(_impl)->subscribe(onMessageReceived);
+        return _impl->subscribe(onMessageReceived);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(const OnDataReceived &onDataReceived)
     {
-        return IDataObservable::Ptr(_impl)->subscribe(onDataReceived);
+        return _impl->subscribe(onDataReceived);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(const OnCompleted &onCompleted)
     {
-        return ICompleteObservable::Ptr(_impl)->subscribe(onCompleted);
+        return _impl->subscribe(onCompleted);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(const OnError &onError)
     {
-        return IErrorObservable::Ptr(_impl)->subscribe(onError);
+        return _impl->subscribe(onError);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
@@ -51,22 +51,22 @@ namespace cm
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(IMessageObserver &observer)
     {
-        return IMessageObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(IDataObserver &observer)
     {
-        return IDataObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(IErrorObserver &observer)
     {
-        return IErrorObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(ICompleteObserver &observer)
     {
-        return ICompleteObservable::Ptr(_impl)->subscribe(observer);
+        return _impl->subscribe(observer);
     }
 
     IUnsubscribable::Ptr CommandOutputChannel::subscribe(IChannelDataObserver &observer)
