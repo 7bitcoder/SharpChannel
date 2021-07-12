@@ -45,4 +45,8 @@ namespace cm
         size_t receiveBufferSize = 4096;
         size_t sendBufferSize = 4096;
     };
+
+    struct NamedPipeChannelSettings {
+
+    };
 }

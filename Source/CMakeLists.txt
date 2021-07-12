@@ -11,6 +11,7 @@ set(SRC
     CommandChannel.cpp
     CommandOutputChannel.cpp
     SocketClientChannel.cpp
+    NamedPipeChannel.cpp
 )
     
 set(MULTIPLATFORM_INCLUDES
@@ -31,6 +32,7 @@ if(OS_WINDOWS)
         Windows/CommandOutputChannelWin.cpp
         #Windows/SocketServerWin.cpp
         Windows/SocketClientChannelWin.cpp
+        Windows/NamedPipeChannelWin.cpp
         #Windows/StdComunicatorWin.cpp
     )
 
