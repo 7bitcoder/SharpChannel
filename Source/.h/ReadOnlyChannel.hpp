@@ -45,10 +45,10 @@ namespace cm
         void nextAllImpl(const std::vector<char> &data) const;
 
 
-        CallbacksHandler<void, const std::string&> _messageHandler; 
-        CallbacksHandler<void, const std::vector<char> &> _dataHandler; 
-        CallbacksHandler<void, const std::exception &> _errorHandler;
-        CallbacksHandler<void> _completeHandler; 
+        CallbacksHandler<void, const std::string&> _messageCallbacks; 
+        CallbacksHandler<void, const std::vector<char> &> _dataCallbacks; 
+        CallbacksHandler<void, const std::exception &> _errorCallbacks;
+        CallbacksHandler<void> _completeCallbacks; 
 
         IChannelEventLoop *_eventLoop = nullptr;
     };
