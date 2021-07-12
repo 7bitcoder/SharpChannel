@@ -78,11 +78,58 @@ TEST(ChannelBehaviour, UnsubscriptionSuccesful)
     settings.command = " ";
     auto comunicator = cm::CommandChannel::create(settings);
 
-    auto onMessageReceived = [](const std::string &msg)
-    {
+    auto onMessageReceived = [](const std::string &msg) {
     };
 
     auto ubsubscriber = comunicator->subscribe(onMessageReceived);
+    EXPECT_TRUE(ubsubscriber->unsubscribe());
+}
+
+TEST(ChannelBehaviour, UnsubscriptionPack)
+{
+    cm::RunCommandSettings settings;
+    settings.command = " ";
+    auto comunicator = cm::CommandChannel::create(settings);
+
+    bool sw = false;
+    auto onMessageReceived = [&sw](const std::string &msg)
+    {
+        sw = true;
+    };
+
+    auto onComplete = [&sw]()
+    {
+        sw = true;
+    };
+
+    auto onError = [&sw](const std::exception &e)
+    {
+        sw = true;
+    };
+
+    auto ubsubscriber = comunicator->subscribe(onMessageReceived, onComplete, onError);
+    ubsubscriber->unsubscribe();
+    comunicator->run();
+
+    EXPECT_FALSE(sw);
+}
+
+TEST(ChannelBehaviour, UnsubscriptionPackSuccesful)
+{
+    cm::RunCommandSettings settings;
+    settings.command = " ";
+    auto comunicator = cm::CommandChannel::create(settings);
+
+    auto onMessageReceived = [](const std::string &msg) {
+    };
+
+    auto onComplete = []() {
+    };
+
+    auto onError = [](const std::exception &e) {
+    };
+
+    auto ubsubscriber = comunicator->subscribe(onMessageReceived, onComplete, onError);
     EXPECT_TRUE(ubsubscriber->unsubscribe());
 }
 

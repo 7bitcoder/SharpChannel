@@ -11,6 +11,8 @@ namespace cm
     public:
         using Ptr = std::shared_ptr<Unsubscriber>;
 
+        static Unsubscriber::Ptr Combine(std::initializer_list<IUnsubscribable::Ptr> unsubscribers);
+
         Unsubscriber(const std::function<bool()> &unsubscriber);
         Unsubscriber(std::initializer_list<IUnsubscribable::Ptr> unsubscribers);
         

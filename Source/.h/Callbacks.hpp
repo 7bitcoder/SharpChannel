@@ -15,7 +15,7 @@ namespace cm
         using Ptr = std::shared_ptr<Callbacks<O, Args...>>;
         using Callback = std::function<O(Args...)>;
 
-        CallbackId add(Callback &callback)
+        CallbackId add(const Callback &callback)
         {
             const std::lock_guard<std::mutex> lock(_guard);
             const CallbackId index = ++currentIndex;
@@ -38,10 +38,10 @@ namespace cm
             }
         }
 
-        void call(CallbackId id, Args... args) const
+        void call(CallbackId callbackId, Args... args) const
         {
             const std::lock_guard<std::mutex> lock(_guard);
-            auto search = _callbacksMap.find(id);
+            auto search = _callbacksMap.find(callbackId);
             if (search != example.end())
             {
                 search->second(args...);
@@ -50,6 +50,11 @@ namespace cm
             {
                 // TODO
             }
+        }
+
+        bool empty() const
+        {
+            return _callbacksMap.empty();
         }
 
     private:

@@ -7,37 +7,37 @@ namespace cm
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived)
     {
-        return makeCallback(onMessageReceived);
+        return _messageHandler.add(onMessageReceived);
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived)
     {
-        return makeCallback(onDataReceived);
+        return _dataHandler.add(onDataReceived);
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnCompleted &onCompleted)
     {
-        return makeCallback(OnMessageReceived(), onCompleted);
+        return _completeHandler.add(onCompleted);
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnError &onError)
     {
-        return makeCallback(OnMessageReceived(), OnCompleted(), onError);
+        return _errorHandler.add(onError);
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnCompleted &onCompleted, const OnError &onError)
     {
-        return makeCallback(OnMessageReceived(), onCompleted, onError);
+        return Unsubscriber::Combine({subscribe(onCompleted), subscribe(onError)});
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return makeCallback(onMessageReceived, onCompleted, onError);
+        return Unsubscriber::Combine({subscribe(onMessageReceived), subscribe(onCompleted), subscribe(onError)});
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
     {
-        return makeCallback(onDataReceived, onCompleted, onError);
+        return Unsubscriber::Combine({subscribe(onDataReceived), subscribe(onCompleted), subscribe(onError)});
     }
 
     IUnsubscribable::Ptr ReadOnlyChannel::subscribe(IMessageObserver &observer)
@@ -80,72 +80,16 @@ namespace cm
         return subscribe(onMessageReceived, onCompleted, onError);
     }
 
-    IUnsubscribable::Ptr ReadOnlyChannel::makeCallback(const OnMessageReceived &onMessageReceived, const OnCompleted &onCompleted, const OnError &onError)
-    {
-        return registerCallback(Callback(onMessageReceived, onCompleted, onError));
-    }
-
-    IUnsubscribable::Ptr ReadOnlyChannel::makeCallback(const OnDataReceived &onDataReceived, const OnCompleted &onCompleted, const OnError &onError)
-    {
-        return registerCallback(Callback(onDataReceived, onCompleted, onError));
-    }
-
-    IUnsubscribable::Ptr ReadOnlyChannel::registerCallback(Callback &callback)
-    {
-        auto callBackId = _callbacksHandler->addCallback(callback);
-        if (callBackId)
-        {
-            auto unsubscriber = [weakHandler = std::weak_ptr<CallbacksHandler>(_callbacksHandler), callBackId]()
-            {
-                auto weakHandlerShared = weakHandler.lock();
-                if (weakHandlerShared)
-                {
-                    return weakHandlerShared->removeCallback(callBackId);
-                }
-                else
-                {
-                    // TODO throw exception;
-                    return false;
-                }
-            };
-            return std::make_unique<Unsubscriber>(unsubscriber);
-        }
-        return nullptr;
-    }
-
-    IUnsubscribable::Ptr ReadOnlyChannel::registerCallback(ICallbacks &callbacks)
-    {
-        auto callBackId = _callbacksHandler->addCallback(callback);
-        if (callBackId)
-        {
-            auto unsubscriber = [weakHandler = std::weak_ptr<CallbacksHandler>(_callbacksHandler), callBackId]()
-            {
-                auto weakHandlerShared = weakHandler.lock();
-                if (weakHandlerShared)
-                {
-                    return weakHandlerShared->removeCallback(callBackId);
-                }
-                else
-                {
-                    // TODO throw exception;
-                    return false;
-                }
-            };
-            return std::make_unique<Unsubscriber>(unsubscriber);
-        }
-        return nullptr;
-    }
-
     void ReadOnlyChannel::nextAll(const std::string &msg) const
     {
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, msg]()
-                                         { _callbacksHandler->nextAll(msg); });
+                                         { nextAllImpl(msg); });
         }
         else
         {
-            return _callbacksHandler->nextAll(msg);
+            return nextAllImpl(msg);
         }
     }
 
@@ -154,11 +98,11 @@ namespace cm
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, data]()
-                                         { _callbacksHandler->nextAll(data); });
+                                         { nextAllImpl(data); });
         }
         else
         {
-            return _callbacksHandler->nextAll(data);
+            return nextAllImpl(data);
         }
     }
 
@@ -167,14 +111,14 @@ namespace cm
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this]()
-                                         { _completeCallbacks->callAll(); });
+                                         { _completeHandler.callAll(); });
 
             // send empty to inform that is finished
             _eventLoop->postChannelEvent(std::function<void(void)>());
         }
         else
         {
-            return _completeCallbacks->callAll();
+            return _completeHandler.callAll();
         }
     }
 
@@ -183,16 +127,36 @@ namespace cm
         if (_eventLoop)
         {
             _eventLoop->postChannelEvent([this, error]()
-                                         { _errorCallbacks->callAll(error); });
+                                         { _errorHandler.callAll(error); });
         }
         else
         {
-            return _errorCallbacks->callAll(error);
+            return _errorHandler.callAll(error);
         }
     }
 
     void ReadOnlyChannel::setChannelEventLoop(IChannelEventLoop *eventLoop)
     {
         _eventLoop = eventLoop;
+    }
+
+    void ReadOnlyChannel::nextAllImpl(const std::string &msg) const
+    {
+        _messageHandler.callAll(msg);
+        if (!_dataHandler.empty())
+        {
+            std::vector<char> data(msg.begin(), msg.end());
+            _dataHandler.callAll(data);
+        }
+    }
+
+    void ReadOnlyChannel::nextAllImpl(const std::vector<char> &data) const
+    {
+        _dataHandler.callAll(data);
+        if (!_messageHandler.empty())
+        {
+            std::string msg(data.begin(), data.end());
+            _messageHandler.callAll(msg);
+        }
     }
 }

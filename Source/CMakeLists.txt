@@ -7,7 +7,6 @@ set(SRC
     ReadOnlyChannel.cpp
     WriteOnlyChannel.cpp
     Callback.cpp
-    CallbacksHandler.cpp
     Unsubscriber.cpp
     CommandChannel.cpp
     CommandOutputChannel.cpp
