@@ -19,7 +19,7 @@ add_executable(Test
     RunTests.cpp
     CommandChannelTest.cpp
     ChannelBehaviourTest.cpp
-    CommandOutputChannel.cpp
+    CommandOutputChannelTest.cpp
     #SocketServerTest.cpp
     #SocketClientChannelTest.cpp
 )
