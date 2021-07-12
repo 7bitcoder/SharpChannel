@@ -47,6 +47,6 @@ namespace cm
     };
 
     struct NamedPipeChannelSettings {
-
+        std::string pipeName;
     };
 }
